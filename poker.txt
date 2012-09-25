@@ -1,0 +1,55 @@
+Name of the game: Texas Holdem Poker
+Number of players: 2 - 9
+
+Game organization:
+Players gather at one table and take sertain sits around table. Number
+of players can vary. Minimum number of players is 2.
+
+Diler chip:
+It is a kind of token that moves from sit to sit clock-wise each game. 
+Each round begins with move of player sitting right after diler chip.
+
+Blinds:
+Is a kind of automatic bets of two players sitting next the diler chip.
+These two players must bet small blind and big blind after game started. 
+Game proceeds with a move of player sitting next to big blind. Small blind 
+equals to the half of big blind. Big blind is a minimal bet of the game.
+
+Bets:
+Player makes a decision during his move. He has next possibilities: fold, 
+check, bet, call, raise. If no player made a bet before: fold, check, bet. 
+If someone has done a bet before: fold, call, raise. Fold - give up current 
+game. Check - just don't make any bet. Bet - claim some amount of available 
+chips (minimum - if noone made a bet before: equal to big blind, if someone 
+made a bet - equal to last bet, maximum - available chips count, "all in"). 
+Call - make a bet equal to last one. Raise - make a bet greater than the last
+one.
+
+Combinations:
+Combination - 5 cards from 5-7 available (had + cards on table) with highest
+total value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
