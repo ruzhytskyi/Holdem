@@ -1,10 +1,10 @@
-class DecisionType(object):
+class DesicionType(object):
 	FOLD = 0
 	BET = 1
 
-class Decision(object):
-	def __init__(self, dec_type, value):
-		self.dec_type = dec_type
+class Desicion(object):
+	def __init__(self, des_type, value):
+		self.des_type = des_type
 		self.value = value
 
 class Rank(object):
