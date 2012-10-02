@@ -1,3 +1,4 @@
+table_history = [game_history1, game_history2]
 game_history = [round1, round2] # is a list of round_histories
 round_history = [lap1, lap2] # is a list of laps during round 
 lap_history = [move1, move2] # is a list of moves for one lap
@@ -8,24 +9,33 @@ move1 = {
 
 from copy import deepcopy
 
-class Round(object):
-	def __init__(self, ):
-		pass
-
-	def start(self):
-		"""Starts a round of game."""
-		pass
-	
-	def get_players(self):
-
-class Game(object):
-	def __init__(self):
-		self.players_num = players_num
-		self.button = Button()
-		self.players = players
+class Table(object):
+	def __init__(self, name, sb, bb, sits_count):
 		self.diler = Diler()
+		self.sb = sb
+		self.bb = bb 
+		self.table_history = []
+		self.sits = [{'player': 'empty', 'bankroll': 0} for i in range(sits_count)]
+
+	def add_player(self, player):
+		"""Registers player for current table"""
+		sit = player.choose_sit(available_sits)
+		sits[sit]['player'] = player
+		sits[sit]['bankroll'] = player.make_buyin()
+		
+	def remove_player(self, player):
+		"""Removes player from current table"""
+		sit = [sits.index(x) for x in sits if x['player'] == player]
+		player.receive_surplus(sits[sit]['bankroll'])
+		sits[sit]['player'] = 'empty'
+		sits[sit]['bankroll'] = 0
+
+	def available_sits(self):
+		"""Returns list of sits numbers that are avaialble for players"""
+		return [sits.index(x) for x in sits if x['player'] == 'empty']	
 	
-	def start(self):
+	def start_game(self):
+		self.button_pos = 0
 		pass
 
 	def preflop(self):
