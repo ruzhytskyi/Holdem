@@ -10,10 +10,11 @@ move1 = {
 from copy import deepcopy
 
 class Table(object):
-	def __init__(self, name, sb, bb, sits_count):
+	def __init__(self, name, sb, bb, sits_count, max_buyin):
 		self.diler = Diler()
 		self.sb = sb
 		self.bb = bb 
+		self.max_buyin = max_buyin
 		self.table_history = []
 		self.sits = [{'player': 'empty', 'bankroll': 0} for i in range(sits_count)]
 
@@ -21,7 +22,7 @@ class Table(object):
 		"""Registers player for current table"""
 		sit = player.choose_sit(available_sits)
 		sits[sit]['player'] = player
-		sits[sit]['bankroll'] = player.make_buyin()
+		sits[sit]['bankroll'] = player.make_buyin(max_buyin)
 		
 	def remove_player(self, player):
 		"""Removes player from current table"""
