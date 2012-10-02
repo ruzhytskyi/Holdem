@@ -16,13 +16,14 @@ class Table(object):
 		self.bb = bb 
 		self.max_buyin = max_buyin
 		self.table_history = []
-		self.sits = [{'player': 'empty', 'bankroll': 0} for i in range(sits_count)]
+		self.sits = [{'player': 'empty', 'bankroll': 0, 'is_active': True} for i in range(sits_count)]
 
 	def add_player(self, player):
 		"""Registers player for current table"""
-		sit = player.choose_sit(available_sits)
+		sit = player.choose_sit(__available_sits__())
 		sits[sit]['player'] = player
 		sits[sit]['bankroll'] = player.make_buyin(max_buyin)
+		sits[sit]['is_active'] = True
 		
 	def remove_player(self, player):
 		"""Removes player from current table"""
@@ -30,27 +31,31 @@ class Table(object):
 		player.receive_surplus(sits[sit]['bankroll'])
 		sits[sit]['player'] = 'empty'
 		sits[sit]['bankroll'] = 0
+		sits[sit]['is_active'] = False
 
-	def available_sits(self):
+	def __available_sits__(self):
 		"""Returns list of sits numbers that are avaialble for players"""
 		return [sits.index(x) for x in sits if x['player'] == 'empty']	
+
+	def __occupied_sits__(self):
+		"""Returns list of sits numbers that are occupied by players"""
+		return list(set(range(sits_count)) - set(__available_sits__()))
 	
 	def start_game(self):
 		self.button_pos = 0
 		pass
 
-	def preflop(self):
+	def __preflop__(self):
 		"""Implementation of preflop round"""
 		player_index = 0
-		while not self.round_finished(cur_lap_hist, len(players)):
+		active_sits = [sits.index(x) for x in sits if x['is_active'] == True]
+		while not __round_finished__(cur_lap_hist):
 			# Should be refactored according to real player methods
 			move = players[player_index].make_move(game_history)
 			if self.verify_move(lap_history, move, bb_val):	
 				lap_history.append(move)
 			
-				
-
-	def verify_move(self, lap_history, move, bb_val):
+	def __verify_move__(self, lap_history, move):
 		lap_hist = remove_folds(lap_history)
 		if len(lap_hist) > 0:
 			return 	move['decision'].value >= \
@@ -59,10 +64,10 @@ class Table(object):
 		else:
 			return True
 	
-	def game_finished(self, lap_history, players_num):
-		return len(remove_folds(lap_history)) == players_num
+	def __game_finished__(self, lap_history):
+		return len(remove_folds(lap_history)) == __occupied_sits()__
 
-	def round_finished(self, lap_history, players_num):
+	def __round_finished__(self, lap_history, players_num):
 		"""Returns true if all players made equal bets, false otherwise."""
 		lap_hist = remove_folds(lap_history)
 		# Returns False if some players haven't made their bets	
@@ -75,7 +80,7 @@ class Table(object):
 				return False
 		return True
 			
-	def remove_folds(self, lap_history):
+	def __remove_folds__(self, lap_history):
 		"""Removes moves with "fold" type from lap history. Returns resulting lap history."""
 		lap_hist = deepcopy(lap_history)
 		for move in lap_hist:
