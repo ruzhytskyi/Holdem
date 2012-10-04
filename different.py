@@ -22,11 +22,19 @@ class Rank(object):
 	KING = 13
 	ACE = 14
 
+	def elements(self):
+		"""Returns list of all elements of enum Rank"""
+		return [x for x in range(2, 15)]
+
 class Suit(object):
 	SPADES = 1
 	HEARTS = 2
 	DIAMONDS = 3
 	CLUBS = 4
+
+	def elements(self):
+		"""Returns list of all elements of enum Suit"""
+		return [x for x in range(1, 5)]
 
 class Card(object):
 	def __init__(self, rank, suit):
