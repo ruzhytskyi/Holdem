@@ -87,6 +87,3 @@ class Table(object):
 			if move['decision'].des_type == DES_TYPE.FOLD:
 				lap_hist.remove(move)
 		return lap_hist
-		
-
-			
