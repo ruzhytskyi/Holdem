@@ -20,6 +20,25 @@ class Diler(object):
 
     def best_combination(self, cards):
         """Returns a list of 5 cards that form best combination"""
+        comb = self.self.__check_straight_flush__(cards)
+        if comb != None: return comb
+        comb = self.__check_four_of_kind__(cards)
+        if comb != None: return comb
+        comb = self.__check_full_house(cards)
+        if comb != None: return comb
+        comb = self.__check_flush__(cards)
+        if comb != None: return comb
+        comb = self.__check_straight__(cards)
+        if comb != None: return comb
+        comb = self.__check_three_of_kind__(cards)
+        if comb != None: return comb
+        comb = self.__check_two_pair__(cards)
+        if comb != None: return comb
+        comb = self.__check_pair__(cards)
+        if comb != None: return comb
+        comb = self.__check_high_card__(cards)
+        if comb != None: return comb
+        print "Raise error"
         
     def __check_straight_flush__(self, cards):
         """Returns a list of 5 cards from given list that form straight flush or None otherwise"""
@@ -43,7 +62,7 @@ class Diler(object):
         fset = scards[0]
         if len(fset) == 3:
             sset = scards[1]
-            if len(sset) == 2
+            if len(sset) == 2:
                 return fset + sset
             else: return None
         else: return None
@@ -75,9 +94,9 @@ class Diler(object):
         if len(scards) != 3:
             return None
         else:
-           rcards = sorted(list(set(cards) - set(scards)),\
-                           key = lambda card: card.rank,\
-                           reverse = True) 
+            rcards = sorted(list(set(cards) - set(scards)),\
+                            key = lambda card: card.rank,\
+                            reverse = True) 
             return scards + rcards[:2]
 
     def __check_two_pair__(self, cards):
