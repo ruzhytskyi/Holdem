@@ -65,7 +65,7 @@ class Table(object):
             return True
     
     def __game_finished__(self, lap_history):
-        return len(remove_folds(lap_history)) == __occupied_sits()__
+        return len(remove_folds(lap_history)) == __occupied_sits__()
 
     def __round_finished__(self, lap_history, players_num):
         """Returns true if all players made equal bets, false otherwise."""
