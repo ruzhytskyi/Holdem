@@ -107,15 +107,17 @@ class Diler(object):
         or None otherwise
         """
         scards = sorted(cards, key = lambda card: card.rank)
-        if scards[-1] == Rank.ACE:
+        if scards[-1].rank == Rank.ACE:
             scards.insert(0, scards[-1])
         # Form possible straight combinations
         # (as sublists in __same_suit__() are sorted
         # in ascending order)
         for i in reversed(range(len(scards) - 4)):
-            comb = scards[i:(4 - len(scards) + i)]
+            comb = scards[i:5 + i]
             if self.__is_straight__(comb) == True:
                 return comb
+
+        return None
 
     def __check_three_of_kind__(self, cards):
         """
@@ -166,7 +168,7 @@ class Diler(object):
         """
         Returns a sorted list of sublists of cards with same suit. Cards in
         sublists doesn't intersect. Cards in sublists are sorted by ranks in
-        ascending order. Resulting list is sorted in decreasing order according
+        ascending order. Resulting list is sorted in descending order according
         to the count of cards with same suit. Sublist with higher card rank is
         greater than sublist with same cards count, but lower card rank.
         """
