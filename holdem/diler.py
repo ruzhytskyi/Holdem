@@ -1,3 +1,5 @@
+from holdem.different import *
+
 class Diler(object):
     def __init__(self, deck):
         self.deck = deck    
@@ -180,15 +182,14 @@ class Diler(object):
 
     def __is_straight__(self, cards):
         """Returns True if cards in given list form straight combination. Raises an error if len(cards) doesn't equal to 5"""
-        RANK = Rank()
         scards = sorted(cards, key = lambda card: card.rank)
-        for i in range(len(scards) - 1):
+        for i in range(len(scards) - 2):
             if scards[i].rank + 1 != scards[i + 1].rank:
                 return False
 
         if scards[-1].rank == scards[-2].rank + 1:
             return True
-        elif scards[-1] == RANK.ACE and scards[0] == RANK.TWO:
+        elif scards[-1].rank == Rank.ACE and scards[0].rank == Rank.TWO:
             return True
         else:
             return False
