@@ -303,5 +303,25 @@ class TestDilerMethods(unittest.TestCase):
         self.assertEqual(ctype, CombType.STRAIGHT_FLUSH)
         self.assertSetEqual(set(rcards), set([c2, c3, c4, c5, c6])) 
 
+    def test_compare_combs_straight_flush(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.FOUR, Suit.CLUBS),\
+                 Card(Rank.FIVE, Suit.CLUBS),\
+                 Card(Rank.SIX, Suit.CLUBS),\
+                 Card(Rank.SEVEN, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.EIGHT, Suit.CLUBS),\
+                 Card(Rank.FOUR, Suit.CLUBS),\
+                 Card(Rank.FIVE, Suit.CLUBS),\
+                 Card(Rank.SIX, Suit.CLUBS),\
+                 Card(Rank.SEVEN, Suit.CLUBS)]
+
+        ctype = CombType.STRAIGHT_FLUSH
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertLess(self._diler.compare_combs(hand1 , hand2), 0)
+
+
 if __name__ == '__main__':
     unittest.main()

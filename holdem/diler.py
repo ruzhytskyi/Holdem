@@ -34,36 +34,36 @@ class Diler(object):
             return c1type - c2type
 
         elif c1type == CombType.STRAIGHT_FLUSH:
-            return __second_highest_rank__(c1cards)\
-                   - __second_highest_rank__(c1cards)
+            return self.__second_highest_rank__(c1cards)\
+                   - self.__second_highest_rank__(c2cards)
 
         elif c1type == CombType.FOUR_OF_KIND:
-            srank1 = __same_rank__(c1cards)
-            srank2 = __same_rank__(c2cards)
+            srank1 = self.__same_rank__(c1cards)
+            srank2 = self.__same_rank__(c2cards)
             if srank1[0][0].rank == srank2[0][0].rank:
                 return srank1[1][0] - srank2[1][0]
             else:
-                srank1[0][0].rank - srank2[0][0].rank
+                return srank1[0][0].rank - srank2[0][0].rank
 
         elif c1type == CombType.FULL_HOUSE:
-            srank1 = __same_rank__(c1cards)
-            srank2 = __same_rank__(c2cards)
+            srank1 = self.__same_rank__(c1cards)
+            srank2 = self.__same_rank__(c2cards)
             if srank1[0][0].rank == srank2[0][0].rank:
                 return srank1[1][0] - srank2[1][0]
             else:
-                srank1[0][0].rank - srank2[0][0].rank
+                return srank1[0][0].rank - srank2[0][0].rank
         
         elif c1type == CombType.FLUSH:
-            return __second_highest_rank__(c1cards)\
-                   - __second_highest_rank__(c1cards)
+            return self.__second_highest_rank__(c1cards)\
+                   - self.__second_highest_rank__(c1cards)
 
         elif c1type == CombType.STRAIGHT:
-            return __second_highest_rank__(c1cards)\
-                   - __second_highest_rank__(c1cards)
+            return self.__second_highest_rank__(c1cards)\
+                   - self.__second_highest_rank__(c1cards)
 
         elif c1type == CombType.THREE_OF_KIND:
-            srank1 = __same_rank__(c1cards)
-            srank2 = __same_rank__(c2cards)
+            srank1 = self.__same_rank__(c1cards)
+            srank2 = self.__same_rank__(c2cards)
             if srank1[0][0].rank == srank2[0][0].rank:
                 # Make a list of cards excluding "three of a kind" combination
                 rcards1 = list(set(c1cards) - set(srank1[0]))
@@ -75,19 +75,19 @@ class Diler(object):
                         return card1.rank - card2.rank
                 return 0
             else:
-                srank1[0][0].rank - srank2[0][0].rank
+                return srank1[0][0].rank - srank2[0][0].rank
  
         elif c1type == CombType.TWO_PAIR:
-            srank1 = __same_rank__(c1cards)
-            srank2 = __same_rank__(c2cards)
+            srank1 = self.__same_rank__(c1cards)
+            srank2 = self.__same_rank__(c2cards)
             for clist1, clist2 in zip(srank1, srank2):
                 if clist1[0].rank != clist2[0].rank:
-                    return clist[0].rank - clist2[0].rank
+                    return clist1[0].rank - clist2[0].rank
             return 0
 
         elif c1type == CombType.PAIR:
-            srank1 = __same_rank__(c1cards)
-            srank2 = __same_rank__(c2cards)
+            srank1 = self.__same_rank__(c1cards)
+            srank2 = self.__same_rank__(c2cards)
             if srank1[0][0].rank == srank2[0][0].rank:
                 # Make a list of cards excluding "three of a kind" combination
                 rcards1 = list(set(c1cards) - set(srank1[0]))
@@ -99,7 +99,7 @@ class Diler(object):
                         return card1.rank - card2.rank
                 return 0
             else:
-                srank1[0][0].rank - srank2[0][0].rank
+                return srank1[0][0].rank - srank2[0][0].rank
            
         elif c1type == CombType.HIGH_CARD:
             scards1 = sorted(c1cards, key = lambda card: card.rank,\
