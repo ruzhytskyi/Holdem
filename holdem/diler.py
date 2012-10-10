@@ -23,36 +23,130 @@ class Diler(object):
         """ 
         pass
 
-    def best_combination(self, cards):
-        """Returns a list of 5 cards that form best combination"""
+    def compare_combs(self, comb1, comb2):
+        """
+        Compares two given combinations. Combination should be passed
+        as a tuple with comb type and comb as list of cards.
+        """
+        c1type, c1cards = comb1
+        c2type, c2cards = comb2
+        if c1type != c2type:
+            return c1type - c2type
+
+        elif c1type == CombType.STRAIGHT_FLUSH:
+            return __second_highest_rank__(c1cards)\
+                   - __second_highest_rank__(c1cards)
+
+        elif c1type == CombType.FOUR_OF_KIND:
+            srank1 = __same_rank__(c1cards)
+            srank2 = __same_rank__(c2cards)
+            if srank1[0][0].rank == srank2[0][0].rank:
+                return srank1[1][0] - srank2[1][0]
+            else:
+                srank1[0][0].rank - srank2[0][0].rank
+
+        elif c1type == CombType.FULL_HOUSE:
+            srank1 = __same_rank__(c1cards)
+            srank2 = __same_rank__(c2cards)
+            if srank1[0][0].rank == srank2[0][0].rank:
+                return srank1[1][0] - srank2[1][0]
+            else:
+                srank1[0][0].rank - srank2[0][0].rank
+        
+        elif c1type == CombType.FLUSH:
+            return __second_highest_rank__(c1cards)\
+                   - __second_highest_rank__(c1cards)
+
+        elif c1type == CombType.STRAIGHT:
+            return __second_highest_rank__(c1cards)\
+                   - __second_highest_rank__(c1cards)
+
+        elif c1type == CombType.THREE_OF_KIND:
+            srank1 = __same_rank__(c1cards)
+            srank2 = __same_rank__(c2cards)
+            if srank1[0][0].rank == srank2[0][0].rank:
+                # Make a list of cards excluding "three of a kind" combination
+                rcards1 = list(set(c1cards) - set(srank1[0]))
+                rcards1.sort(key = lambda card: card.rank, reverse = True)
+                rcards2 = list(set(c2cards) - set(srank2[0]))
+                rcards2.sort(key = lambda card: card.rank, reverse = True)
+                for card1, card2 in zip(rcards1, rcards2):
+                    if card1.rank != card2.rank:
+                        return card1.rank - card2.rank
+                return 0
+            else:
+                srank1[0][0].rank - srank2[0][0].rank
+ 
+        elif c1type == CombType.TWO_PAIR:
+            srank1 = __same_rank__(c1cards)
+            srank2 = __same_rank__(c2cards)
+            for clist1, clist2 in zip(srank1, srank2):
+                if clist1[0].rank != clist2[0].rank:
+                    return clist[0].rank - clist2[0].rank
+            return 0
+
+        elif c1type == CombType.PAIR:
+            srank1 = __same_rank__(c1cards)
+            srank2 = __same_rank__(c2cards)
+            if srank1[0][0].rank == srank2[0][0].rank:
+                # Make a list of cards excluding "three of a kind" combination
+                rcards1 = list(set(c1cards) - set(srank1[0]))
+                rcards1.sort(key = lambda card: card.rank, reverse = True)
+                rcards2 = list(set(c2cards) - set(srank2[0]))
+                rcards2.sort(key = lambda card: card.rank, reverse = True)
+                for card1, card2 in zip(rcards1, rcards2):
+                    if card1.rank != card2.rank:
+                        return card1.rank - card2.rank
+                return 0
+            else:
+                srank1[0][0].rank - srank2[0][0].rank
+           
+        elif c1type == CombType.HIGH_CARD:
+            scards1 = sorted(c1cards, key = lambda card: card.rank,\
+                             reverse = True)
+            scards2 = sorted(c2cards, key = lambda card: card.rank,\
+                             reverse = True)
+            for card1, card2 in zip(scards1, scards2):
+                if card1.rank != card2.rank:
+                    return card1.rank - card2.rank
+            return 0
+    
+        else:
+            return 'Error'
+
+    def best_comb(self, cards):
+        """
+        Returns a tuple with combination type as a first element and
+        list of 5 cards that form best combination as a second element.
+        """
         comb = self.__check_straight_flush__(cards)
         if comb != None:
-            return comb
+            return (CombType.STRAIGHT_FLUSH, comb)
         comb = self.__check_four_of_kind__(cards)
         if comb != None:
-            return comb
+            return (CombType.FOUR_OF_KIND, comb)
         comb = self.__check_full_house__(cards)
         if comb != None:
-            return comb
+            return (CombType.FULL_HOUSE, comb)
         comb = self.__check_flush__(cards)
         if comb != None:
-            return comb
+            return (CombType.FLUSH, comb)
         comb = self.__check_straight__(cards)
         if comb != None:
-            return comb
+            return (CombType.STRAIGHT, comb)
         comb = self.__check_three_of_kind__(cards)
         if comb != None:
-            return comb
+            return (CombType.THREE_OF_KIND, comb)
         comb = self.__check_two_pair__(cards)
         if comb != None:
-            return comb
+            return (CombType.TWO_PAIR, comb)
         comb = self.__check_pair__(cards)
         if comb != None:
-            return comb
+            return (CombType.PAIR, comb)
         comb = self.__check_high_card__(cards)
         if comb != None:
-            return comb
-        print "Raise error"
+            return (CombType.HIGH_CARD, comb)
+        return 'Error'
         
     def __check_straight_flush__(self, cards):
         """
@@ -238,6 +332,10 @@ class Diler(object):
     def __highest_rank__(self, cards):
         """Returns a highest rank among given cards"""
         return sorted(cards, key = lambda card: card.rank)[-1].rank
+
+    def __second_highest_rank__(self, cards):
+        """Returns a second highest rank among given cards"""
+        return sorted(cards, key = lambda card: card.rank)[-2].rank
 
     def __is_straight__(self, cards):
         """

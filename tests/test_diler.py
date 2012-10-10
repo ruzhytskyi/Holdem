@@ -279,5 +279,29 @@ class TestDilerMethods(unittest.TestCase):
         rcards = self._diler.__check_high_card__(cards)
         self.assertSetEqual(set(rcards), set([c1, c3, c4, c5, c6]))
 
+    def test_best_comb_full_house(self):
+        c1 = Card(Rank.THREE, Suit.CLUBS)
+        c2 = Card(Rank.THREE, Suit.HEARTS)
+        c3 = Card(Rank.JACK, Suit.HEARTS)
+        c4 = Card(Rank.JACK, Suit.SPADES)
+        c5 = Card(Rank.JACK, Suit.CLUBS)
+        c6 = Card(Rank.THREE, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6]
+        ctype, rcards = self._diler.best_comb(cards)
+        self.assertEqual(ctype, CombType.FULL_HOUSE)
+        self.assertSetEqual(set(rcards), set([c1, c2, c3, c4, c5])) 
+       
+    def test_best_comb_straight_flush(self):
+        c1 = Card(Rank.THREE, Suit.CLUBS)
+        c2 = Card(Rank.NINE, Suit.HEARTS)
+        c3 = Card(Rank.JACK, Suit.HEARTS)
+        c4 = Card(Rank.QUEEN, Suit.HEARTS)
+        c5 = Card(Rank.KING, Suit.HEARTS)
+        c6 = Card(Rank.TEN, Suit.HEARTS)
+        cards = [c1, c2, c3, c4, c5, c6]
+        ctype, rcards = self._diler.best_comb(cards)
+        self.assertEqual(ctype, CombType.STRAIGHT_FLUSH)
+        self.assertSetEqual(set(rcards), set([c2, c3, c4, c5, c6])) 
+
 if __name__ == '__main__':
     unittest.main()
