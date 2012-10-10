@@ -307,14 +307,14 @@ class TestDilerMethods(unittest.TestCase):
         comb1 = [Card(Rank.THREE, Suit.CLUBS),\
                  Card(Rank.FOUR, Suit.CLUBS),\
                  Card(Rank.FIVE, Suit.CLUBS),\
-                 Card(Rank.SIX, Suit.CLUBS),\
-                 Card(Rank.SEVEN, Suit.CLUBS)]
+                 Card(Rank.ACE, Suit.CLUBS),\
+                 Card(Rank.TWO, Suit.CLUBS)]
 
-        comb2 = [Card(Rank.EIGHT, Suit.CLUBS),\
-                 Card(Rank.FOUR, Suit.CLUBS),\
-                 Card(Rank.FIVE, Suit.CLUBS),\
-                 Card(Rank.SIX, Suit.CLUBS),\
-                 Card(Rank.SEVEN, Suit.CLUBS)]
+        comb2 = [Card(Rank.ACE, Suit.CLUBS),\
+                 Card(Rank.JACK, Suit.CLUBS),\
+                 Card(Rank.QUEEN, Suit.CLUBS),\
+                 Card(Rank.KING, Suit.CLUBS),\
+                 Card(Rank.JACK, Suit.CLUBS)]
 
         ctype = CombType.STRAIGHT_FLUSH
         hand1 = (ctype, comb1)
