@@ -70,11 +70,12 @@ class Diler(object):
         Returns a list of 5 cards from given list that form four of a kind
         or None otherwise
         """
-        scards = self.__same_rank__(cards)[0]
-        if len(scards) == 4:
-            return scards
+        scards = self.__same_rank__(cards)
+        fset = scards[0]
+        if len(fset) != 4:
+            return None 
         else:
-            return None
+            return fset + [scards[1][0]]
 
     def __check_full_house__(self, cards):
         """
@@ -85,8 +86,8 @@ class Diler(object):
         fset = scards[0]
         if len(fset) == 3:
             sset = scards[1]
-            if len(sset) == 2:
-                return fset + sset
+            if len(sset) >= 2:
+                return fset + sset[:2]
             else: return None
         else: return None
 
@@ -99,7 +100,7 @@ class Diler(object):
         if len(scards) < 5:
             return None
         else:
-            return scards[-6:-1]
+            return scards[-5:]
 
     def __check_straight__(self, cards):
         """
@@ -144,7 +145,7 @@ class Diler(object):
         elif len(scards[1]) != 2:
             return None
         else:
-            return scards[0] + scards[1] + max(scards[2])
+            return scards[0] + scards[1] + [scards[2][0]]
 
     def __check_pair__(self, cards):
         """
@@ -155,14 +156,14 @@ class Diler(object):
         if len(scards[0]) != 2:
             return None
         else:
-            rcards = sorted(list(set(cards) - set(scards)),\
+            rcards = sorted(list(set(cards) - set(scards[0])),\
                             key = lambda card: card.rank,\
                             reverse = True) 
             return scards[0] + rcards[:3]
 
     def __check_high_card__(self, cards):
         """Returns a list of 5 cards from given list that form high card"""
-        return sorted(cards, lambda card: card.rank, reverse = True)[:5]
+        return sorted(cards, key = lambda card: card.rank, reverse = True)[:5]
 
     def __same_suit__(self, cards):
         """

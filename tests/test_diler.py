@@ -14,7 +14,7 @@ class TestDilerMethods(unittest.TestCase):
         comb.append(Card(Rank.SIX, Suit.DIAMONDS))
         comb.append(Card(Rank.THREE, Suit.DIAMONDS))
         comb.append(Card(Rank.FOUR, Suit.DIAMONDS))
-        comb.append(Card(Rank.FIVE, Suit.DIAMONDS))
+        comb.append(Card(Rank.FIVE, Suit.DIAMONDS)) 
         self.assertTrue(self._diler.__is_straight__(comb))
 
 
@@ -175,6 +175,109 @@ class TestDilerMethods(unittest.TestCase):
         cards = [c1, c2, c3, c4, c5, c6]
         rcards = self._diler.__check_straight_flush__(cards)
         self.assertEqual(rcards, None)
+
+    def test___check_four_of_kind__(self):
+        c1 = Card(Rank.JACK, Suit.HEARTS)
+        c2 = Card(Rank.FOUR, Suit.CLUBS)
+        c3 = Card(Rank.JACK, Suit.CLUBS)
+        c4 = Card(Rank.TWO, Suit.CLUBS)
+        c5 = Card(Rank.JACK, Suit.DIAMONDS)
+        c6 = Card(Rank.JACK, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6]
+        rcards = self._diler.__check_four_of_kind__(cards)
+        self.assertSetEqual(set(rcards), set([c1, c2, c3, c5, c6]))
+
+    def test___check_four_of_kind__negative(self):
+        c1 = Card(Rank.THREE, Suit.HEARTS)
+        c2 = Card(Rank.FOUR, Suit.CLUBS)
+        c3 = Card(Rank.JACK, Suit.CLUBS)
+        c4 = Card(Rank.TWO, Suit.CLUBS)
+        c5 = Card(Rank.JACK, Suit.DIAMONDS)
+        c6 = Card(Rank.JACK, Suit.SPADES)
+        c7 = Card(Rank.QUEEN, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6, c7]
+        rcards = self._diler.__check_four_of_kind__(cards)
+        self.assertEqual(rcards, None)
+
+    def test___check_full_house__(self):
+        c1 = Card(Rank.THREE, Suit.HEARTS)
+        c2 = Card(Rank.QUEEN, Suit.CLUBS)
+        c3 = Card(Rank.JACK, Suit.CLUBS)
+        c4 = Card(Rank.TWO, Suit.CLUBS)
+        c5 = Card(Rank.JACK, Suit.DIAMONDS)
+        c6 = Card(Rank.JACK, Suit.SPADES)
+        c7 = Card(Rank.QUEEN, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6, c7]
+        rcards = self._diler.__check_full_house__(cards)
+        self.assertSetEqual(set(rcards), set([c2, c3, c5, c6, c7]))
+
+    def test___check_full_house__two_thriplets(self):
+        c1 = Card(Rank.QUEEN, Suit.HEARTS)
+        c2 = Card(Rank.QUEEN, Suit.CLUBS)
+        c3 = Card(Rank.JACK, Suit.CLUBS)
+        c4 = Card(Rank.TWO, Suit.CLUBS)
+        c5 = Card(Rank.JACK, Suit.DIAMONDS)
+        c6 = Card(Rank.JACK, Suit.SPADES)
+        c7 = Card(Rank.QUEEN, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6, c7]
+        rcards = self._diler.__check_full_house__(cards)
+        self.assertSetEqual(set(rcards), set([c1, c2, c3, c5, c7]))
+
+    def test___check_flush__(self):
+        c1 = Card(Rank.THREE, Suit.CLUBS)
+        c2 = Card(Rank.QUEEN, Suit.CLUBS)
+        c3 = Card(Rank.JACK, Suit.CLUBS)
+        c4 = Card(Rank.TWO, Suit.CLUBS)
+        c5 = Card(Rank.ACE, Suit.CLUBS)
+        c6 = Card(Rank.JACK, Suit.SPADES)
+        c7 = Card(Rank.KING, Suit.CLUBS)
+        cards = [c1, c2, c3, c4, c5, c6, c7]
+        rcards = self._diler.__check_flush__(cards)
+        self.assertSetEqual(set(rcards), set([c1, c2, c3, c5, c7]))
+
+    def test___check_three_of_kind__(self):
+        c1 = Card(Rank.THREE, Suit.CLUBS)
+        c2 = Card(Rank.QUEEN, Suit.CLUBS)
+        c3 = Card(Rank.JACK, Suit.HEARTS)
+        c4 = Card(Rank.JACK, Suit.SPADES)
+        c5 = Card(Rank.ACE, Suit.CLUBS)
+        c6 = Card(Rank.JACK, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6]
+        rcards = self._diler.__check_three_of_kind__(cards)
+        self.assertSetEqual(set(rcards), set([c2, c3, c4, c5, c6]))
+
+    def test___check_two_pair__(self):
+        c1 = Card(Rank.THREE, Suit.CLUBS)
+        c2 = Card(Rank.THREE, Suit.HEARTS)
+        c3 = Card(Rank.JACK, Suit.HEARTS)
+        c4 = Card(Rank.JACK, Suit.SPADES)
+        c5 = Card(Rank.ACE, Suit.CLUBS)
+        c6 = Card(Rank.ACE, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6]
+        rcards = self._diler.__check_two_pair__(cards)
+        self.assertSetEqual(set(rcards), set([c1, c3, c4, c5, c6]))
+
+    def test___check_pair__(self):
+        c1 = Card(Rank.THREE, Suit.CLUBS)
+        c2 = Card(Rank.THREE, Suit.HEARTS)
+        c3 = Card(Rank.JACK, Suit.HEARTS)
+        c4 = Card(Rank.JACK, Suit.SPADES)
+        c5 = Card(Rank.QUEEN, Suit.CLUBS)
+        c6 = Card(Rank.ACE, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6]
+        rcards = self._diler.__check_pair__(cards)
+        self.assertSetEqual(set(rcards), set([c2, c3, c4, c5, c6]))
+
+    def test___high_card__(self):
+        c1 = Card(Rank.THREE, Suit.CLUBS)
+        c2 = Card(Rank.THREE, Suit.HEARTS)
+        c3 = Card(Rank.JACK, Suit.HEARTS)
+        c4 = Card(Rank.JACK, Suit.SPADES)
+        c5 = Card(Rank.QUEEN, Suit.CLUBS)
+        c6 = Card(Rank.ACE, Suit.SPADES)
+        cards = [c1, c2, c3, c4, c5, c6]
+        rcards = self._diler.__check_high_card__(cards)
+        self.assertSetEqual(set(rcards), set([c1, c3, c4, c5, c6]))
 
 if __name__ == '__main__':
     unittest.main()
