@@ -322,6 +322,159 @@ class TestDilerMethods(unittest.TestCase):
 
         self.assertLess(self._diler.compare_combs(hand1 , hand2), 0)
 
+    def test_compare_combs_four_of_kind(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.THREE, Suit.SPADES),\
+                 Card(Rank.THREE, Suit.HEARTS),\
+                 Card(Rank.TWO, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.THREE, Suit.SPADES),\
+                 Card(Rank.THREE, Suit.HEARTS),\
+                 Card(Rank.ACE, Suit.CLUBS)]
+
+        ctype = CombType.FOUR_OF_KIND
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertLess(self._diler.compare_combs(hand1 , hand2), 0)
+
+    def test_compare_combs_full_house(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.THREE, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.TWO, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.TWO, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.TWO, Suit.CLUBS)]
+
+        ctype = CombType.FULL_HOUSE
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertGreater(self._diler.compare_combs(hand1 , hand2), 0)
+
+    def test_compare_combs_flush(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.KING, Suit.CLUBS),\
+                 Card(Rank.FIVE, Suit.CLUBS),\
+                 Card(Rank.ACE, Suit.CLUBS),\
+                 Card(Rank.TWO, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.ACE, Suit.CLUBS),\
+                 Card(Rank.JACK, Suit.CLUBS),\
+                 Card(Rank.QUEEN, Suit.CLUBS),\
+                 Card(Rank.TWO, Suit.CLUBS),\
+                 Card(Rank.JACK, Suit.CLUBS)]
+
+        ctype = CombType.FLUSH
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertGreater(self._diler.compare_combs(hand1 , hand2), 0)
+
+    def test_compare_combs_straight(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.FOUR, Suit.HEARTS),\
+                 Card(Rank.FIVE, Suit.CLUBS),\
+                 Card(Rank.ACE, Suit.CLUBS),\
+                 Card(Rank.TWO, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.ACE, Suit.CLUBS),\
+                 Card(Rank.JACK, Suit.CLUBS),\
+                 Card(Rank.QUEEN, Suit.HEARTS),\
+                 Card(Rank.KING, Suit.CLUBS),\
+                 Card(Rank.JACK, Suit.CLUBS)]
+
+        ctype = CombType.STRAIGHT
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertLess(self._diler.compare_combs(hand1 , hand2), 0)
+
+    def test_compare_combs_three_of_kind(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.THREE, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.ACE, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.THREE, Suit.SPADES),\
+                 Card(Rank.ACE, Suit.HEARTS),\
+                 Card(Rank.QUEEN, Suit.CLUBS)]
+
+        ctype = CombType.THREE_OF_KIND
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertLess(self._diler.compare_combs(hand1 , hand2), 0)
+
+    def test_compare_combs_two_pair(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.TWO, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.ACE, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.TWO, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.QUEEN, Suit.CLUBS)]
+
+        ctype = CombType.TWO_PAIR
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertGreater(self._diler.compare_combs(hand1 , hand2), 0)
+
+    def test_compare_combs_pair(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.KING, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.ACE, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.THREE, Suit.DIAMONDS),\
+                 Card(Rank.ACE, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.QUEEN, Suit.CLUBS)]
+
+        ctype = CombType.PAIR
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertGreater(self._diler.compare_combs(hand1 , hand2), 0)
+
+    def test_compare_combs_high_card(self):
+        comb1 = [Card(Rank.THREE, Suit.CLUBS),\
+                 Card(Rank.QUEEN, Suit.DIAMONDS),\
+                 Card(Rank.KING, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.ACE, Suit.CLUBS)]
+
+        comb2 = [Card(Rank.FOUR, Suit.CLUBS),\
+                 Card(Rank.KING, Suit.DIAMONDS),\
+                 Card(Rank.ACE, Suit.SPADES),\
+                 Card(Rank.TWO, Suit.HEARTS),\
+                 Card(Rank.QUEEN, Suit.CLUBS)]
+
+        ctype = CombType.HIGH_CARD
+        hand1 = (ctype, comb1)
+        hand2 = (ctype, comb2)
+
+        self.assertLess(self._diler.compare_combs(hand1 , hand2), 0)
+
+
 
 if __name__ == '__main__':
     unittest.main()

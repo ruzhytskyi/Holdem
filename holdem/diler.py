@@ -41,7 +41,7 @@ class Diler(object):
             srank1 = self.__same_rank__(c1cards)
             srank2 = self.__same_rank__(c2cards)
             if srank1[0][0].rank == srank2[0][0].rank:
-                return srank1[1][0] - srank2[1][0]
+                return srank1[1][0].rank - srank2[1][0].rank
             else:
                 return srank1[0][0].rank - srank2[0][0].rank
 
@@ -49,17 +49,17 @@ class Diler(object):
             srank1 = self.__same_rank__(c1cards)
             srank2 = self.__same_rank__(c2cards)
             if srank1[0][0].rank == srank2[0][0].rank:
-                return srank1[1][0] - srank2[1][0]
+                return srank1[1][0].rank - srank2[1][0].rank
             else:
                 return srank1[0][0].rank - srank2[0][0].rank
         
         elif c1type == CombType.FLUSH:
             return self.__second_highest_rank__(c1cards)\
-                   - self.__second_highest_rank__(c1cards)
+                   - self.__second_highest_rank__(c2cards)
 
         elif c1type == CombType.STRAIGHT:
             return self.__second_highest_rank__(c1cards)\
-                   - self.__second_highest_rank__(c1cards)
+                   - self.__second_highest_rank__(c2cards)
 
         elif c1type == CombType.THREE_OF_KIND:
             srank1 = self.__same_rank__(c1cards)
