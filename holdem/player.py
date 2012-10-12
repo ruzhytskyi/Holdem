@@ -13,7 +13,7 @@ class Player(object):
         else:
             return Decision(DTYPE.BET, r)
             
-    def choose_sit(self, available_sits):
+    def take_sit(self, available_sits):
         """Returns a sit number chosen by player"""
         return available_sits[randint(len(available_sits))]
                 
@@ -26,3 +26,6 @@ class Player(object):
     def receive_surplus(value):
         """Increase players cash amount when player leaves a game"""
         cash_amount += value
+
+class PlayerAtTable(Player):
+    pass

@@ -1,11 +1,10 @@
-table_history = [game_history1, game_history2]
-game_history = [round1, round2] # is a list of round_histories
-round_history = [lap1, lap2] # is a list of laps during round 
-lap_history = [move1, move2] # is a list of moves for one lap
-move1 = {
-    'player': 'Player1',
-    'decision': decision,
-}
+# table_history = [game_history1, game_history2]
+# game_history = [round1, round2] # is a list of round_histories
+# round_history = [lap1, lap2] # is a list of laps during round 
+# lap_history = [move1, move2] # is a list of moves for one lap
+# move1 = {
+#     'player': 'Player1',
+#     'decision': decision,
 
 from copy import deepcopy
 
@@ -16,22 +15,27 @@ class Table(object):
         self.bb = bb 
         self.max_buyin = max_buyin
         self.table_history = []
-        self.sits = [{'player': 'empty', 'bankroll': 0, 'is_active': True} for i in range(sits_count)]
+        self.sits = [{'player': None, 'bankroll': None, 'is_active': None}]\
+                    * sits_count
+        self.players = {}
 
     def add_player(self, player):
         """Registers player for current table"""
         sit = player.choose_sit(__available_sits__())
-        sits[sit]['player'] = player
+        sits[sit]['player_id'] = player.ident
         sits[sit]['bankroll'] = player.make_buyin(max_buyin)
         sits[sit]['is_active'] = True
+        players[player_id] = player
         
     def remove_player(self, player):
         """Removes player from current table"""
-        sit = [sits.index(x) for x in sits if x['player'] == player]
+        sit = [sits.index(x) for x in sits if x['player_id'] == player.ident]
         player.receive_surplus(sits[sit]['bankroll'])
-        sits[sit]['player'] = 'empty'
-        sits[sit]['bankroll'] = 0
-        sits[sit]['is_active'] = False
+        sits[sit]['player_id'] = None
+        sits[sit]['bankroll'] = None
+        sits[sit]['is_active'] = None
+        del(players['player_id'])
+        
 
     def __available_sits__(self):
         """Returns list of sits numbers that are avaialble for players"""
@@ -48,12 +52,15 @@ class Table(object):
     def __preflop__(self):
         """Implementation of preflop round"""
         player_index = 0
-        active_sits = [sits.index(x) for x in sits if x['is_active'] == True]
-        while not __round_finished__(cur_lap_hist):
-            # Should be refactored according to real player methods
-            move = players[player_index].make_move(game_history)
-            if self.verify_move(lap_history, move, bb_val): 
+        playing_sits = [sits.index(x) for x in sits if x['is_active'] == True]
+        while True:
+            for sit in playing_sits:
+                # Should be refactored according to real player methods
+                move = sit['player'].make_move(game_history)
                 lap_history.append(move)
+                self.bank += move['decision'].value
+            if __round_finished__(lap_history):
+                break
             
     def __verify_move__(self, lap_history, move):
         lap_hist = remove_folds(lap_history)
@@ -87,3 +94,10 @@ class Table(object):
             if move['decision'].des_type == DES_TYPE.FOLD:
                 lap_hist.remove(move)
         return lap_hist
+
+    def __is_allin__(self, lap_history):
+        """Returns True if last move in lap_history is all-in"""
+        if len(lap_history) == 1 and \
+           lap_history[0]['decision'] < self.sb and \
+           lap_history[0]['player_id']
+           
