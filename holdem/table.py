@@ -15,51 +15,57 @@ class Table(object):
         self.bb = bb 
         self.max_buyin = max_buyin
         self.table_history = []
-        self.sits = [{'player': None, 'bankroll': None, 'is_active': None}]\
-                    * sits_count
+        self.sits = range(1, sits_count + 1)
         self.players = {}
 
     def add_player(self, player):
         """Registers player for current table"""
-        sit = player.choose_sit(__available_sits__())
-        sits[sit]['player_id'] = player.ident
-        sits[sit]['bankroll'] = player.make_buyin(max_buyin)
-        sits[sit]['is_active'] = True
-        players[player_id] = player
+        tplayer = PlayerAtTable(player)
+        tplayer.take_sit(__available_sits__())
+        tplayer.make_buyin(max_buyin)
+        self.players.append(tplayer)
+        tplayer.become_active()
         
     def remove_player(self, player):
         """Removes player from current table"""
-        sit = [sits.index(x) for x in sits if x['player_id'] == player.ident]
-        player.receive_surplus(sits[sit]['bankroll'])
-        sits[sit]['player_id'] = None
-        sits[sit]['bankroll'] = None
-        sits[sit]['is_active'] = None
-        del(players['player_id'])
+        pass
         
 
     def __available_sits__(self):
         """Returns list of sits numbers that are avaialble for players"""
-        return [sits.index(x) for x in sits if x['player'] == 'empty']  
+        return list(set(sits) - set(__occupied_sits__()))
 
     def __occupied_sits__(self):
         """Returns list of sits numbers that are occupied by players"""
-        return list(set(range(sits_count)) - set(__available_sits__()))
-    
+        return [player.sit for player in players]
+
+class Game(object):
+    def __init__(self, players):
+        self.players = players
+        self.gameinfo = []
+   
     def start_game(self):
         self.button_pos = 0
         pass
 
-    def __preflop__(self):
-        """Implementation of preflop round"""
-        player_index = 0
-        playing_sits = [sits.index(x) for x in sits if x['is_active'] == True]
-        while True:
-            for sit in playing_sits:
-                # Should be refactored according to real player methods
-                move = sit['player'].make_move(game_history)
-                lap_history.append(move)
-                self.bank += move['decision'].value
-            if __round_finished__(lap_history):
+    def play_game(self):
+        """Implementation of game flow"""
+        game_info = []
+        for round_no in range(4)
+            game_info.append({'laps': [[]], 'cards': []})
+	        lap_no = 0
+	        while True:
+	            for player in players:
+	                move = player.make_move(game_info)
+	                game_info[round_no]['laps'][lap_no].append(move)
+	                self.bank += move['decision'].value
+	                player.bankroll -= move['decision'].value
+	            if __round_finished__(game_info):
+	                break
+	            lap_no += 1
+	            game_info[round_no]['laps'].append([])
+    
+            if __game_finished__(game_info):
                 break
             
     def __verify_move__(self, lap_history, move):

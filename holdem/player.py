@@ -1,12 +1,19 @@
 from random import randint
-from different import Desicion
+from different import Decision
 
 class Player(object):
-    def __init__(self, name, cash_amount):
+    def __init__(self, name, cash_amount, plid):
         self.name = name
         self.cash_amount = cache_amount
+        self.plid = plid
 
-    def make_decision(self, game_info):
+class PlayerAtTable(object):
+    def __init__(self, player):
+        self.player = player
+        self.bankroll = 0
+        self.is_active = False
+
+    def make_move(self, game_info):
         r = randint(5)
         if r == 0:
             return Decision(DTYPE.FOLD, 0)
@@ -14,18 +21,24 @@ class Player(object):
             return Decision(DTYPE.BET, r)
             
     def take_sit(self, available_sits):
-        """Returns a sit number chosen by player"""
-        return available_sits[randint(len(available_sits))]
+        """Player chooses a sit among available"""
+        self.sit = available_sits[randint(len(available_sits))]
                 
     def make_buyin(max_buyin):
-        """Returns a buyin sum chosen by player"""
+        """Player makes a buy-in"""
         buyin = max(max_buyin, cash_amount)
-        cash_amount -= buyin
-        return buyin
+        self.player.cash_amount -= buyin
+        self.bankroll += buyin
 
     def receive_surplus(value):
         """Increase players cash amount when player leaves a game"""
-        cash_amount += value
+        self.player.cash_amount += value
+        self.bankroll -= value
 
-class PlayerAtTable(Player):
-    pass
+    def become_active(self):
+        """If active, player joins next game"""
+        self.is_active = True
+
+    def become_inactive(self):
+        """If inactive, player skips next game"""
+        self.is_active = False
