@@ -43,22 +43,19 @@ class Game(object):
     def __init__(self, players):
         self.players = players
         self.banks = []
-        game_info = {
-            'cards': []
-            'moves': []
-            'sb': self.sb
-            'bb': self.bb
-            'but_pos': self.but_pos
+        self.game_info = {
+            'cards': [], # Contains list of cards opened by diler
+                        # for each round.
+            'moves': [], # Contains list of rounds. Each round - list of laps.
+                        # Each lap - list of moves.
+            'sb': self.sb, # Small blind value
+            'bb': self.bb, # Big blind value
+            'but_pos': self.but_pos, # Button position
+             # Info about bankrolls before game started
             'bankrolls': dict([(player.plid, player.bankroll)\
                                for player in players])
             }
-
    
-    def start_game(self):
-        self.button_pos = 0
-        pass
-
-
     def play_game(self):
         """Implementation of game flow"""
         # Give each player two cards
@@ -69,69 +66,78 @@ class Game(object):
         self.banks.append({'value': 0, 'players': None})
         # Start a rounds of bets
         for round_no in range(4)
-            game_info['moves'].append([])
+            game_info['moves'].append([[]])
+            game_info['cards'].append([])
             if round_no == 1:
-                game_info[round_no]['cards'] = diler.give_three_cards()
+                game_info['cards'][round_no] = diler.give_three_cards()
             elif round_no == 2 or round_no == 3:
-                game_info[round_no]['cards'] = diler.give_card()
-	        lap_no = 0
-	        while True:
-                game_info['moves'][round_no] = []
-	            for player in players:
-	                move = player.make_move(game_info)
-	                game_info[round_no]['laps'][lap_no].append(move)
-	                self.banks[bank_no]['value'] += move['decision'].value
-	                player.bankroll -= move['decision'].value
+                game_info['cards'][round_no] = diler.give_card()
+            lap_no = 0
+            while True:
+                game_info['moves'][round_no].append([[]])
+                allins = []
+                for player in players:
+                    move = player.make_move(game_info)
+                    game_info['moves'][round_no][lap_no].append(move)
+                    bet = move.value
+                    if move.dec_type == DecisionType.FOLD:
+                        self.players.remove(player)
                     # Handling a case when player went all-in
-                    if player.bankroll == 0:
-                        self.banks[bank_no]['players'] = players
-                        players.remove[player]
+                    elif player.bankroll == 0:
+                        self.banks[-1]['players'] = \
+                        [player.plid for player in players]
                         self.banks.append({'value': 0, 'players': None})
+                        self.allins.append(bet)
+ 
+                    if len(allins) > 0:
+                        diff = 0
+                        for i, allin in enumerate(self.allins):
+                            diff = allin['bet'] - diff
+                            banks[i]['value'] += diff 
+                            bet -= diff
+                            player.bankroll -= diff
+                                
+                        self.banks[-1]['value'] += bet
+                        player.bankroll -= bet
 
-	            if __round_finished__(game_info):
-	                break
-	            lap_no += 1
-	            game_info[round_no]['laps'].append([])
+                if __round_finished__(game_info):
+                    break
+                lap_no += 1
+                game_info[round_no]['laps'].append([])
     
-            if __game_finished__(game_info):
+            if len(self.players) < 2:
                 break
             
-    def __verify_move__(self, lap_history, move):
-        lap_hist = remove_folds(lap_history)
-        if len(lap_hist) > 0:
-            return  move['decision'].value >= \
-                lap_hist[-1]['decision'].value and \
-                move['decision'].value % bb_val == 0 
-        else:
-            return True
-    
-    def __game_finished__(self, lap_history):
-        return len(remove_folds(lap_history)) == __occupied_sits__()
+            for bank in banks:
+                bank['players'] = list(set(bank['players']) & \
+                                       set(players))
+                for player in bank['players']:
+                    player.bankroll += bank['value'] / \
+                                       len(bank['players'])
 
-    def __round_finished__(self, lap_history, players_num):
-        """Returns true if all players made equal bets, false otherwise."""
-        lap_hist = remove_folds(lap_history)
+    def __round_finished__(self, lap, allins_cnt):
+        """
+        Returns true if all players made equal bets, false otherwise.
+        """
+        flap = remove_folds(lap)
         # Returns False if some players haven't made their bets 
-        if len(lap_hist) < players_num:
+        if len(flap) < len(self.players) - allins_cnt:
             return False 
 
-        first_move = lap_hist[0]
-        for i, move in enumerate(lap_hist, 1):
+        first_move = flap[0]
+        for i, move in enumerate(flap, 1):
             if move['decision'].value != first_move['decision'].value:
                 return False
         return True
             
-    def __remove_folds__(self, lap_history):
-        """Removes moves with "fold" type from lap history. Returns resulting lap history."""
-        lap_hist = deepcopy(lap_history)
-        for move in lap_hist:
-            if move['decision'].des_type == DES_TYPE.FOLD:
-                lap_hist.remove(move)
-        return lap_hist
-
-    def __is_allin__(self, lap_history):
-        """Returns True if last move in lap_history is all-in"""
-        if len(lap_history) == 1 and \
-           lap_history[0]['decision'] < self.sb and \
-           lap_history[0]['player_id']
+    def __remove_folds__(self, lap):
+        """
+        Removes moves with "fold" type from moves list.
+        Returns resulting lap info.
+        """
+        clap = deepcopy(lap)
+        for move in clap:
+            if move['decision'].des_type == DecisionType.FOLD:
+                clap.remove(move)
+        return clap 
 
