@@ -42,24 +42,52 @@ class Table(object):
 class Game(object):
     def __init__(self, players):
         self.players = players
-        self.gameinfo = []
+        self.banks = []
+        game_info = {
+            'cards': []
+            'moves': []
+            'sb': self.sb
+            'bb': self.bb
+            'but_pos': self.but_pos
+            'bankrolls': dict([(player.plid, player.bankroll)\
+                               for player in players])
+            }
+
    
     def start_game(self):
         self.button_pos = 0
         pass
 
+
     def play_game(self):
         """Implementation of game flow"""
-        game_info = []
+        # Give each player two cards
+        for player in players:
+            player.cards = diler.give_two_cards()
+
+        bank_no = 0
+        self.banks.append({'value': 0, 'players': None})
+        # Start a rounds of bets
         for round_no in range(4)
-            game_info.append({'laps': [[]], 'cards': []})
+            game_info['moves'].append([])
+            if round_no == 1:
+                game_info[round_no]['cards'] = diler.give_three_cards()
+            elif round_no == 2 or round_no == 3:
+                game_info[round_no]['cards'] = diler.give_card()
 	        lap_no = 0
 	        while True:
+                game_info['moves'][round_no] = []
 	            for player in players:
 	                move = player.make_move(game_info)
 	                game_info[round_no]['laps'][lap_no].append(move)
-	                self.bank += move['decision'].value
+	                self.banks[bank_no]['value'] += move['decision'].value
 	                player.bankroll -= move['decision'].value
+                    # Handling a case when player went all-in
+                    if player.bankroll == 0:
+                        self.banks[bank_no]['players'] = players
+                        players.remove[player]
+                        self.banks.append({'value': 0, 'players': None})
+
 	            if __round_finished__(game_info):
 	                break
 	            lap_no += 1
@@ -106,4 +134,4 @@ class Game(object):
         if len(lap_history) == 1 and \
            lap_history[0]['decision'] < self.sb and \
            lap_history[0]['player_id']
-           
+
