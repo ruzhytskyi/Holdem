@@ -17,6 +17,7 @@ class PlayerAtTable(object):
     """
     def __init__(self, player):
         self.player = player
+        self.plid = player.plid
         self.bankroll = 0
         self.is_active = False
 
@@ -26,9 +27,11 @@ class PlayerAtTable(object):
         """
         r = randint(0, 5)
         if r == 0:
-            return Decision(DecisionType.FOLD, 0)
+            return {'plid': self.player.plid, 
+                    'decision': Decision(DecisionType.FOLD, 0)}
         else:
-            return Decision(DecisionType.BET, r)
+            return {'plid': self.player.plid,
+                    'decision': Decision(DecisionType.BET, r)}
             
     def take_sit(self, available_sits):
         """Player chooses a sit among available"""

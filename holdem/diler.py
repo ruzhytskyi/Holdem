@@ -22,7 +22,7 @@ class Diler(object):
         Returns 0 if move is correct and 1 otherwise.
         """ 
         pass
-
+    
     def compare_combs(self, comb1, comb2):
         """
         Compares two given combinations. Combination should be passed
