@@ -32,7 +32,7 @@ class Game(object):
         # Sort players accroding to button position
         func = lambda player: player.sit if player.sit > self.but_pos \
                                             else player.sit + len(self.sits)
-        players.sort(key = func)
+        self.players.sort(key = func)
         # Give each player two cards
         for player in self.players:
             player.cards = self.diler.give_two_cards()
@@ -52,7 +52,7 @@ class Game(object):
             self.table.display_cards(self.game_info)
 
             if len([player for player in self.players \
-                                if player.bankroll != 0) < 2:
+                                if player.bankroll != 0]) < 2:
                 continue
 
             while True:
@@ -123,7 +123,7 @@ class Game(object):
         """
         Returns a player instance given it's id.
         """
-        return filter(lambda pl: True if pl.plid = plid \
+        return filter(lambda pl: True if pl.plid == plid \
                                         else False, self.players)[0] 
 
     def __determine_winners__(self):
@@ -132,7 +132,7 @@ class Game(object):
         """
         cards_on_table = []
         # Form a list of cards handed out by diler
-        for cards in self.game_info['cards']
+        for cards in self.game_info['cards']:
             cards_on_table.extend(cards)
         # Making list of tuples with players ids and their best combinations
         pl_combs = [(pl.plid, self.diler.best_comb(cards_on_table + pl.cards)) \
@@ -145,7 +145,7 @@ class Game(object):
         winners_ids = []
         # Determing winners ids
         for comb in pl_combs:
-            if self.diler.compare_combs(comb[1], combs[0][1]) == 0:
+            if self.diler.compare_combs(comb[1], pl_combs[0][1]) == 0:
                 winners_ids.append(comb[0])
         
 
@@ -171,6 +171,6 @@ class Game(object):
         """
         clap = deepcopy(lap)
         for move in clap:
-            if move['decision'].des_type == DecisionType.FOLD:
+            if move['decision'].dec_type == DecisionType.FOLD:
                 clap.remove(move)
         return clap 

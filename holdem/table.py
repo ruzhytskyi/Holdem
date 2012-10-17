@@ -1,15 +1,18 @@
 from holdem.diler import Diler
 from holdem.player import PlayerAtTable
+from holdem.different import Deck
 
 class Table(object):
     """
     Implementation of table abstraction.
     """
     def __init__(self, name, sbl, bbl, sits_count, max_buyin):
-        self.diler = Diler()
+        self.deck = Deck()
+        self.diler = Diler(self.deck)
         self.sbl = sbl
         self.bbl = bbl
         self.max_buyin = max_buyin
+        self.but_pos = 1
         self.table_history = []
         self.sits = range(1, sits_count + 1)
         self.players = []

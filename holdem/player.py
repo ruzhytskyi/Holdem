@@ -35,7 +35,7 @@ class PlayerAtTable(object):
             
     def take_sit(self, available_sits):
         """Player chooses a sit among available"""
-        self.sit = available_sits[randint(0, len(available_sits))]
+        self.sit = available_sits[randint(0, len(available_sits) -1 )]
                 
     def make_buyin(self, max_buyin):
         """Player makes a buy-in"""
