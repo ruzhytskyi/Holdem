@@ -20,6 +20,7 @@ class PlayerAtTable(object):
         self.plid = player.plid
         self.bankroll = 0
         self.is_active = False
+        self.cards = []
 
     def make_move(self, game_info):
         """

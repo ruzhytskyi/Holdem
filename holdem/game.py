@@ -59,7 +59,10 @@ class Game(object):
                 self.game_info['moves'][round_no].append([[]])
                 allins = []
                 allin_ids = set([])
-                for player in self.players:
+                # Position in list where removed items will be copied
+                # to be deleted later
+                pos = 0
+                for i, player in enumerate(self.players):
                     if player.plid not in allin_ids:
                         move = player.make_move(self.game_info)
                     else: 
@@ -70,12 +73,12 @@ class Game(object):
                     bet = move['decision'].value
                     player.bankroll -= bet
                     if move.dec_type == DecisionType.FOLD:
-                        self.players.remove(player)
+                        self.players.insert(pos, self.players.pop(i))
                         continue
                     # Handling a case when player went all-in
                     if player.bankroll == 0:
                         current_bank['player_ids'] = \
-                            [player.plid for player in self.players]
+                            [player.plid for player in self.players[pos:]]
                         self.banks[round_no].append(deepcopy(current_bank))
                         current_bank = {'value': 0, 'player_ids': None}
                         allins.append(bet)
@@ -90,11 +93,13 @@ class Game(object):
                                 
                     current_bank['value'] += bet
 
+                # Remove previously moved items from beginning of the list
+                del(self.players[:pos])
+
                 # Checking end of round condition
                 if self.__round_finished__(self.game_info, len(allins)):
                     break
                 lap_no += 1
-                self.game_info[round_no]['laps'].append([])
     
             # Checking end of game condition
             if len(self.players) == 1:
@@ -147,9 +152,11 @@ class Game(object):
         for comb in pl_combs:
             if self.diler.compare_combs(comb[1], pl_combs[0][1]) == 0:
                 winners_ids.append(comb[0])
+
+        return winners_ids
         
 
-    def __round_finished__(self, lap, allins_cnt):
+    def __round_finished__(self, allins, lap, allins_cnt):
         """
         Returns true if all players made equal bets, false otherwise.
         """
@@ -158,9 +165,9 @@ class Game(object):
         if len(flap) < len(self.players) - allins_cnt:
             return False 
 
-        first_move = flap[0]
+        lap_bet = [m['decision'].value for m in lap if m['plid'] not in allins][0]
         for move in flap:
-            if move['decision'].value != first_move['decision'].value:
+            if move['decision'].value > lap_bet:
                 return False
         return True
             
@@ -169,8 +176,11 @@ class Game(object):
         Removes moves with "fold" type from moves list.
         Returns resulting lap info.
         """
+        pos = 0
         clap = deepcopy(lap)
-        for move in clap:
+        for i, move in enumerate(clap):
             if move['decision'].dec_type == DecisionType.FOLD:
-                clap.remove(move)
+                clap.insert(pos, clap.pop(i))
+                pos += 1
+        del(clap[:pos])
         return clap 

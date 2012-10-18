@@ -6,6 +6,9 @@ class Decision(object):
     def __init__(self, dec_type, value):
         self.dec_type = dec_type
         self.value = value
+    
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__ 
 
 class Rank(object):
     TWO = 2
