@@ -1,0 +1,8 @@
+table = Table('tT', 1, 2, 4, 100)
+player1 = Player('p1', 300, 1)
+player2 = Player('p2', 300, 2)
+player3 = Player('p3', 300, 3)
+table.add_player(self.player1)
+table.add_player(self.player2)
+table.add_player(self.player3)
+game = Game(self.table) 

@@ -94,5 +94,8 @@ class TestGameMethods(unittest.TestCase):
         winners_ids = self.game.__determine_winners__()
         self.assertEqual(winners_ids, [1, 2])
 
+    def test___player_by_id__(self):
+        self.assertEqual(self.game.__player_by_id__(2), self.game.players[1])
+
 if __name__ == '__main__':
     unittest.main()
