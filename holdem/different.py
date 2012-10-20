@@ -48,15 +48,16 @@ from random import randint
 class Deck(object):
     def __init__(self, cards_count = 52):
         self.deck = []
+        self.cards_count = cards_count
         for i in range(1, cards_count + 1):
             self.deck.append(i)
     
     def pop_card(self):
         """Returns Card object taken randomly from a Deck"""
-        card_no = randint(1, cards_count)
+        card_no = randint(1, self.cards_count)
         card = self.deck[card_no]
         self.deck.remove(self.deck[card_no])
-        cards_count -= 1
+        self.cards_count -= 1
         rank = card % 14 + 1
         suit = card / 14 + 1
         return Card(rank, suit)

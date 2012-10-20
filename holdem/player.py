@@ -38,9 +38,9 @@ class PlayerAtTable(object):
         """Player chooses a sit among available"""
         self.sit = available_sits[randint(0, len(available_sits) -1 )]
                 
-    def make_buyin(self, max_buyin):
+    def make_buyin(self, min_buyin):
         """Player makes a buy-in"""
-        buyin = max(max_buyin, self.player.cash_amount)
+        buyin = max(min_buyin, self.player.cash_amount)
         self.player.cash_amount -= buyin
         self.bankroll += buyin
 
@@ -56,3 +56,77 @@ class PlayerAtTable(object):
     def become_inactive(self):
         """If inactive, player skips next game"""
         self.is_active = False
+
+class CLIPlayer(Player):
+    """
+    Implementation of command line interface player
+    """
+    def __init__(self, player):
+        self.player = player
+        self.plid = player.plid
+        self.bankroll = 0
+        self.is_active = False
+        self.cards = []
+
+    def make_move(self, game_info):
+        """
+        Implementation of player's strategy.
+        """
+        cur_lap = game_info['moves'][-1][-1]
+        min_bet = sorted(cur_lap, key = lambda m: m['value'])[-1]
+        print "Minimal allowed bet is: %r" % min_bet
+        print "Maximum allowed bet is: %r" % self.bankroll
+        while True:
+            print "Make a bet or fold: 'f'."
+            bet = raw_input("Please, make a bet: ")
+            if bet == 'f':
+                return {'plid': self.player.plid,
+                        'decision': Decision(DecisionType.FOLD, 0)}
+
+            bet = int(bet) 
+            
+            if min_bet <= bet <= self.bankroll:
+                return {'plid': self.player.plid,
+                        'decision': Decision(DecisionType.BET, bet)}
+            else:
+                print "You've made a wrong move. Try again."
+       
+    def take_sit(self, available_sits):
+        """Player chooses a sit among available"""
+        print "Currently available sits are: %r" % available_sits
+        while True:
+            sit = raw_input("Please, choose your sit: ")
+            if int(sit) in available_sits:
+                self.sit = int(sit)
+                break
+            else:
+                print "This sit is not among available."
+
+    def make_buyin(self, min_buyin):
+        """Player makes a buy-in"""
+        print "Your cash amount is: %r. Min buyin for this table is: %r" \
+               % (self.player.cash_amount, min_buyin) 
+
+        while True:
+            buyin = int(raw_input("Please, choose an amount of chips to start with: "))
+            if min_buyin <= buyin <= self.player.cash_amount:
+                self.player.cash_amount -= buyin
+                self.bankroll += buyin 
+                break
+            else:
+                print "Your choise doesn't satisfy given constraints"
+
+
+    def receive_surplus(self, value):
+        """Increase players cash amount when player leaves a game"""
+        self.player.cash_amount += value
+        self.bankroll -= value
+
+    def become_active(self):
+        """If active, player joins next game"""
+        self.is_active = True
+
+    def become_inactive(self):
+        """If inactive, player skips next game"""
+        self.is_active = False
+
