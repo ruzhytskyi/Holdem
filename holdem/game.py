@@ -66,7 +66,7 @@ class Game(object):
                 pos = 0
                 for i, player in enumerate(self.players):
                     if player.plid not in allin_ids:
-                        move = player.make_move(self.game_info)
+                        move = player.make_move(self.game_info, self.__cum_bets__)
                     else: 
                         continue
                     # Show player's move
@@ -94,13 +94,13 @@ class Game(object):
                             bet -= diff
                                 
                     current_bank['value'] += bet
+                    # Checking end of round condition
+                    if self.__round_finished__(allins, self.game_info['moves'][-1], len(allins)):
+                        break
 
                 # Remove previously moved items from beginning of the list
                 del(self.players[:pos])
 
-                # Checking end of round condition
-                if self.__round_finished__(allins, self.game_info['moves'][-1], len(allins)):
-                    break
                 lap_no += 1
     
             # Checking end of game condition
@@ -163,9 +163,6 @@ class Game(object):
         Returns true if all players made equal bets, false otherwise.
         """
         flap = self.__remove_folds__(laps[-1])
-        # Returns False if some players haven't made their bets 
-        if len(flap) < len(self.players) - allins_cnt:
-            return False 
 
         # Calculate cumulative bets
         cum_bets = self.__cum_bets__(laps)
@@ -174,13 +171,16 @@ class Game(object):
         for plid, val in cum_bets.items():
             if plid not in allins:
                 ethval = val
-        print cum_bet
+        print cum_bets
                 
         for plid, val in cum_bets.items():
             if plid not in allins and val != ethval:
                 return False
         return True
     
+    # This method is used outside of this class (without an instance
+    # of this class). So this should be fixed. Maybe by separating 
+    # some Utils class containing common use methods.
     def __cum_bets__(self, laps):
         """
         Returns a dictionary with sums of all bets for each player

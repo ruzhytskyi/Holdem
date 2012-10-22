@@ -72,14 +72,14 @@ class CLIPlayer(Player):
         """
         Implementation of player's strategy.
         """
-        cur_lap = game_info['moves'][-1][-1]
-        print cur_lap
-        if len(cur_lap) != 0:
-            min_bet = sorted(cur_lap, key = lambda m: m['decision'].value)[-1]['decision'].value
-        elif len(game_info['moves'][-1]) > 1:
-            prev_lap = game_info['moves'][-1][-2]
-            min_bet = sorted(prev_lap, key = lambda m: m['decision'].value)[-1]['decision'].value
-        else: min_bet = 0
+        laps = game_info['moves'][-1]
+        cumul_bets = cum_bets(laps)
+        if cumul_bets == {}:
+            min_bet = 0
+        elif self.plid not in cumul_bets.keys():
+            min_bet = max(cumul_bets.values())
+        else:
+            min_bet = max(cumul_bets.values()) - cumul_bets[self.plid]
             
         print "Minimal allowed bet is: %r" % min_bet
         print "Maximum allowed bet is: %r" % self.bankroll
