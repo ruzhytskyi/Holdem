@@ -1,6 +1,10 @@
 class DecisionType(object):
     FOLD = 0
     BET = 1
+    CALL = 2
+    CHECK = 3
+    RAISE = 4
+    ALLIN = 5
 
 class Decision(object):
     def __init__(self, dec_type, value):
@@ -55,8 +59,7 @@ class Deck(object):
     def pop_card(self):
         """Returns Card object taken randomly from a Deck"""
         card_no = randint(1, self.cards_count)
-        card = self.deck[card_no]
-        self.deck.remove(self.deck[card_no])
+        card = self.deck.pop(card_no - 1)
         self.cards_count -= 1
         rank = card % 14 + 1
         suit = card / 14 + 1

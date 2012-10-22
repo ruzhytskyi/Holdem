@@ -68,12 +68,19 @@ class CLIPlayer(Player):
         self.is_active = False
         self.cards = []
 
-    def make_move(self, game_info):
+    def make_move(self, game_info, cum_bets):
         """
         Implementation of player's strategy.
         """
         cur_lap = game_info['moves'][-1][-1]
-        min_bet = sorted(cur_lap, key = lambda m: m['value'])[-1]
+        print cur_lap
+        if len(cur_lap) != 0:
+            min_bet = sorted(cur_lap, key = lambda m: m['decision'].value)[-1]['decision'].value
+        elif len(game_info['moves'][-1]) > 1:
+            prev_lap = game_info['moves'][-1][-2]
+            min_bet = sorted(prev_lap, key = lambda m: m['decision'].value)[-1]['decision'].value
+        else: min_bet = 0
+            
         print "Minimal allowed bet is: %r" % min_bet
         print "Maximum allowed bet is: %r" % self.bankroll
         while True:
@@ -95,7 +102,9 @@ class CLIPlayer(Player):
         """Player chooses a sit among available"""
         print "Currently available sits are: %r" % available_sits
         while True:
-            sit = raw_input("Please, choose your sit: ")
+# For debug purpose
+#            sit = raw_input("Please, choose your sit: ")
+            sit = available_sits[randint(0, len(available_sits) - 1)]
             if int(sit) in available_sits:
                 self.sit = int(sit)
                 break
@@ -108,7 +117,8 @@ class CLIPlayer(Player):
                % (self.player.cash_amount, min_buyin) 
 
         while True:
-            buyin = int(raw_input("Please, choose an amount of chips to start with: "))
+            # buyin = int(raw_input("Please, choose an amount of chips to start with: "))
+            buyin = 200
             if min_buyin <= buyin <= self.player.cash_amount:
                 self.player.cash_amount -= buyin
                 self.bankroll += buyin 

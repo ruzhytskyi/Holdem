@@ -40,7 +40,9 @@ class Game(object):
         current_bank = {'value': 0, 'player_ids': None}
         # Start a rounds of bets
         for round_no in range(4):
-            self.game_info['moves'].append([[]])
+            print self.game_info['moves']
+            self.game_info['moves'].append([])
+            print self.game_info['moves']
             self.game_info['cards'].append([])
             if round_no == 1:
                 self.game_info['cards'][round_no] = self.diler.give_three_cards()
@@ -56,7 +58,7 @@ class Game(object):
                 continue
 
             while True:
-                self.game_info['moves'][round_no].append([[]])
+                self.game_info['moves'][round_no].append([])
                 allins = []
                 allin_ids = set([])
                 # Position in list where removed items will be copied
@@ -68,11 +70,11 @@ class Game(object):
                     else: 
                         continue
                     # Show player's move
-                    self.table.display_move(self.game_info)
+                    # self.table.display_move(self.game_info)
                     self.game_info['moves'][round_no][lap_no].append(move)
                     bet = move['decision'].value
                     player.bankroll -= bet
-                    if move.dec_type == DecisionType.FOLD:
+                    if move['decision'].dec_type == DecisionType.FOLD:
                         self.players.insert(pos, self.players.pop(i))
                         continue
                     # Handling a case when player went all-in
@@ -97,7 +99,7 @@ class Game(object):
                 del(self.players[:pos])
 
                 # Checking end of round condition
-                if self.__round_finished__(self.game_info, len(allins)):
+                if self.__round_finished__(allins, self.game_info['moves'][-1], len(allins)):
                     break
                 lap_no += 1
     
@@ -156,21 +158,43 @@ class Game(object):
         return winners_ids
         
 
-    def __round_finished__(self, allins, lap, allins_cnt):
+    def __round_finished__(self, allins, laps, allins_cnt):
         """
         Returns true if all players made equal bets, false otherwise.
         """
-        flap = self.__remove_folds__(lap)
+        flap = self.__remove_folds__(laps[-1])
         # Returns False if some players haven't made their bets 
         if len(flap) < len(self.players) - allins_cnt:
             return False 
 
-        lap_bet = [m['decision'].value for m in lap if m['plid'] not in allins][0]
-        for move in flap:
-            if move['decision'].value > lap_bet:
+        # Calculate cumulative bets
+        cum_bets = self.__cum_bets__(laps)
+ 
+        ethval = 0
+        for plid, val in cum_bets.items():
+            if plid not in allins:
+                ethval = val
+        print cum_bet
+                
+        for plid, val in cum_bets.items():
+            if plid not in allins and val != ethval:
                 return False
         return True
-            
+    
+    def __cum_bets__(self, laps):
+        """
+        Returns a dictionary with sums of all bets for each player
+        """
+        cum_bet = {}
+        for lap in laps:
+            flap = self.__remove_folds__(lap)
+            for move in flap:
+                if cum_bet.has_key(move['plid']):
+                    cum_bet[move['plid']] += move['decision'].value
+                else:
+                    cum_bet[move['plid']] = move['decision'].value
+        return cum_bet
+       
     def __remove_folds__(self, lap):
         """
         Removes moves with "fold" type from moves list.

@@ -38,3 +38,9 @@ class Table(object):
         """Returns list of sits numbers that are occupied by players"""
         return [player.sit for player in self.players]
 
+
+    def display_cards(self, game_info):
+        print "Diler hands out next card(s): %r" % game_info['cards'][-1]
+
+    def display_move(self, game_info):
+        pass
