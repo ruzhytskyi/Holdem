@@ -38,17 +38,20 @@ class Game(object):
             player.cards = self.diler.give_two_cards()
 
         current_bank = {'value': 0, 'player_ids': None}
+
+        folds = []
+        allins = []
+        made_move = []
+        will_move = self.players
+
         # Start a rounds of bets
         for round_no in range(4):
-            print self.game_info['moves']
             self.game_info['moves'].append([])
-            print self.game_info['moves']
             self.game_info['cards'].append([])
             if round_no == 1:
                 self.game_info['cards'][round_no] = self.diler.give_three_cards()
             elif round_no == 2 or round_no == 3:
                 self.game_info['cards'][round_no] = self.diler.give_card()
-            lap_no = 0
     
             # Show cards handed out by diler
             self.table.display_cards(self.game_info)
@@ -57,61 +60,37 @@ class Game(object):
                                 if player.bankroll != 0]) < 2:
                 continue
 
-            while True:
-                self.game_info['moves'][round_no].append([])
-                allins = []
-                allin_ids = set([])
-                # Position in list where removed items will be copied
-                # to be deleted later
-                pos = 0
-                for i, player in enumerate(self.players):
-                    if player.plid not in allin_ids:
-                        move = player.make_move(self.game_info, self.__cum_bets__)
-                    else: 
-                        continue
-                    # Show player's move
-                    # self.table.display_move(self.game_info)
-                    self.game_info['moves'][round_no][lap_no].append(move)
-                    bet = move['decision'].value
-                    player.bankroll -= bet
-                    if move['decision'].dec_type == DecisionType.FOLD:
-                        self.players.insert(pos, self.players.pop(i))
-                        continue
-                    # Handling a case when player went all-in
-                    if player.bankroll == 0:
-                        current_bank['player_ids'] = \
-                            [player.plid for player in self.players[pos:]]
-                        self.banks[round_no].append(deepcopy(current_bank))
-                        current_bank = {'value': 0, 'player_ids': None}
-                        allins.append(bet)
-                        allin_ids.add(player.plid)
-                    # Handle multiple banks situation (one or more allins) 
-                    if len(allins) > 0:
-                        diff = 0
-                        for i, allin in enumerate(allins):
-                            diff = allin - diff
-                            self.banks[round_no][i]['value'] += diff 
-                            bet -= diff
+            while len(will_move) != 0:
+                player = will_move.pop(0) 
+                if player not in allins:
+                    move = player.make_move(self.game_info, self.__cum_bets__)
+                else: 
+                    continue
+                # Show player's move
+                # self.table.display_move(self.game_info)
+                self.game_info['moves'][round_no].append(move)
+                bet = move['decision'].value
+                player.bankroll -= bet
+                if move['decision'].dec_type == DecisionType.FOLD:
+                    folds.append(player)
+                    continue
+                # Handling a case when player went all-in
+                elif move['decision'].dec_type == DecisionType.ALLIN
+                    allins.append(player)
+                    continue
+                elif move['decision'].dec_type == DecisionType.RAISE
+                    will_move.extend(made_move)
+                elif move['decision'].dec_type == DecisionType.RAISEALLIN
+                    allins.append(player)
+                    will_move.extend(made_move)
+                    continue
+
+                made_move.append(player)
                                 
-                    current_bank['value'] += bet
-                    # Checking end of round condition
-                    if self.__round_finished__(allins, self.game_info['moves'][-1], len(allins)):
-                        break
-
-                # Remove previously moved items from beginning of the list
-                del(self.players[:pos])
-
-                lap_no += 1
-    
             # Checking end of game condition
-            if len(self.players) == 1:
+            if len(made_move) == 1:
                 break
 
-        # Finalize current bank and add it to banks list
-        current_bank['player_ids'] = \
-            [player.plid for player in self.players]
-        self.banks[round_no].append(deepcopy(current_bank))
-        
         # Determine winners
         winner_ids = self.__determine_winners__()
 
@@ -156,55 +135,15 @@ class Game(object):
                 winners_ids.append(comb[0])
 
         return winners_ids
+
+    def __calculate_banks__(self, game_info):
+        """
+        Returns list of banks with values and player ids sharing them
+        """
+        banks = [{}]
+        for moves_round in game_info['moves']:
+            for move in moves_round:
+                if move['decision'].dec_type == DecisionType.FOLD and \
+                        move['plid'] in  
+                 
         
-
-    def __round_finished__(self, allins, laps, allins_cnt):
-        """
-        Returns true if all players made equal bets, false otherwise.
-        """
-        flap = self.__remove_folds__(laps[-1])
-
-        # Calculate cumulative bets
-        cum_bets = self.__cum_bets__(laps)
- 
-        ethval = 0
-        for plid, val in cum_bets.items():
-            if plid not in allins:
-                ethval = val
-        print cum_bets
-                
-        for plid, val in cum_bets.items():
-            if plid not in allins and val != ethval:
-                return False
-        return True
-    
-    # This method is used outside of this class (without an instance
-    # of this class). So this should be fixed. Maybe by separating 
-    # some Utils class containing common use methods.
-    def __cum_bets__(self, laps):
-        """
-        Returns a dictionary with sums of all bets for each player
-        """
-        cum_bet = {}
-        for lap in laps:
-            flap = self.__remove_folds__(lap)
-            for move in flap:
-                if cum_bet.has_key(move['plid']):
-                    cum_bet[move['plid']] += move['decision'].value
-                else:
-                    cum_bet[move['plid']] = move['decision'].value
-        return cum_bet
-       
-    def __remove_folds__(self, lap):
-        """
-        Removes moves with "fold" type from moves list.
-        Returns resulting lap info.
-        """
-        pos = 0
-        clap = deepcopy(lap)
-        for i, move in enumerate(clap):
-            if move['decision'].dec_type == DecisionType.FOLD:
-                clap.insert(pos, clap.pop(i))
-                pos += 1
-        del(clap[:pos])
-        return clap 

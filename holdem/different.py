@@ -5,6 +5,7 @@ class DecisionType(object):
     CHECK = 3
     RAISE = 4
     ALLIN = 5
+    RAISEALLIN = 6
 
 class Decision(object):
     def __init__(self, dec_type, value):
