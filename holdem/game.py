@@ -140,10 +140,27 @@ class Game(object):
         """
         Returns list of banks with values and player ids sharing them
         """
-        banks = [{}]
+        banks = []
+        curr_bank = {}
         for moves_round in game_info['moves']:
             for move in moves_round:
-                if move['decision'].dec_type == DecisionType.FOLD and \
-                        move['plid'] in  
+                bet = move['decision'].value
+                dect = move['decision'].dec_type
+                if dect == DecisionType.ALLINRAISE
+                    banks.append(curr_bank)
+                    curr_bank = {}
+                if len(banks) > 0:
+                    for bank in banks:
+                        if move['plid'] in bank['shares'].keys():
+                            if bank['shares'][move['plid']] < bank['max_bet']:
+                                diff = bank['max_bet'] \
+                                       - bank['shares'][move['plid']]
+
+                                bank['value'] += diff 
+                                bet -= diff
+                        else:
+                            bank['shares'][move['plid']] = bank['max_bet']
+                            bet -= bank['max_bet']
+                        
                  
         
