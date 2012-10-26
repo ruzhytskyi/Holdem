@@ -68,18 +68,32 @@ class CLIPlayer(Player):
         self.is_active = False
         self.cards = []
 
-    def make_move(self, game_info, cum_bets):
+    def make_move(self, game_info):
         """
         Implementation of player's strategy.
         """
-        laps = game_info['moves'][-1]
-        cumul_bets = cum_bets(laps)
-        if cumul_bets == {}:
-            min_bet = 0
-        elif self.plid not in cumul_bets.keys():
-            min_bet = max(cumul_bets.values())
-        else:
-            min_bet = max(cumul_bets.values()) - cumul_bets[self.plid]
+        moves = []
+        # Making one list for all moves
+        for mround in game_info['moves']:
+            moves.extend(mround)
+        if len(moves) == 0:
+            print "Player's move: small blind - %r" %game_info['sbl']
+            return {'plid': self.player.plid,
+                    'decision': Decision(DecisionType.BET, game_info['sbl'])}
+        if len(moves) == 1:
+            print "Player's move: big blind - %r" %game_info['bbl']
+            return {'plid': self.player.plid,
+                    'decision': Decision(DecisionType.RAISE, game_info['bbl'])}
+          
+        min_bet = 0
+        for move in reversed(moves):
+            if move['decision'].dec_type == DecisionType.FOLD:
+                continue
+            if move['decision'].dec_type == DecisionType.ALLIN:
+                continue
+            min_bet = move['decision'].value
+            break 
+                
             
         print "Minimal allowed bet is: %r" % min_bet
         print "Maximum allowed bet is: %r" % self.bankroll

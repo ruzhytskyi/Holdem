@@ -62,8 +62,13 @@ class Game(object):
 
             while len(will_move) != 0:
                 player = will_move.pop(0) 
+                # Checking end of game: if only one player left in game
+                if len(made_move) == 0 and len(will_move) == 0:
+                    made_move.append(player)
+                    break
+
                 if player not in allins:
-                    move = player.make_move(self.game_info, self.__cum_bets__)
+                    move = player.make_move(self.game_info)
                 else: 
                     continue
                 # Show player's move
@@ -87,9 +92,11 @@ class Game(object):
 
                 made_move.append(player)
                                 
-            # Checking end of game condition
+            # Checking end of game condition: if only one player in next round
             if len(made_move) == 1:
                 break
+
+            will_move = made_move[:]
 
         # Determine winners
         winner_ids = self.__determine_winners__()
