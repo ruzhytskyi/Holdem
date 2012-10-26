@@ -17,65 +17,7 @@ class TestGameMethods(unittest.TestCase):
         self.table.add_player(self.player2)
         self.table.add_player(self.player3)
         self.game = Game(self.table) 
-
-    def test___remove_folds__(self):
-        move1 = {
-            'decision': Decision(DecisionType.BET, 10),
-            'plid': 1
-        }
-        move2 = {
-            'decision': Decision(DecisionType.FOLD, 0),
-            'plid': 2
-        }
-        move3 = {
-            'decision': Decision(DecisionType.FOLD, 0),
-            'plid': 3
-        }
-
-        lap = [move1, move2, move3]
-        rlap = self.game.__remove_folds__(lap)
-        self.assertEqual(rlap, [move1])
-    
-    def test___round_finished__positive(self):
-        move1 = {
-            'decision': Decision(DecisionType.BET, 10),
-            'plid': 1
-        }
-        move2 = {
-            'decision': Decision(DecisionType.BET, 10),
-            'plid': 2
-        }
-        move3 = {
-            'decision': Decision(DecisionType.FOLD, 0),
-            'plid': 3
-        }
-
-        del(self.game.players[:2])
-
-        lap = [move1, move2, move3]
-        allins = set([])
-        self.assertTrue(self.game.__round_finished__(allins, lap, 0))
-
-    def test___round_finished__negative(self):
-        move1 = {
-            'decision': Decision(DecisionType.BET, 10),
-            'plid': 1
-        }
-        move2 = {
-            'decision': Decision(DecisionType.BET, 15),
-            'plid': 2
-        }
-        move3 = {
-            'decision': Decision(DecisionType.FOLD, 0),
-            'plid': 3
-        }
-
-        del(self.game.players[2:])
-
-        lap = [move1, move2, move3]
-        allins = set([2])
-        self.assertFalse(self.game.__round_finished__(allins, lap, 0))
-
+   
     def test___determine_winners__(self):
         c1 = Card(Rank.TWO, Suit.SPADES) 
         c2 = Card(Rank.THREE, Suit.SPADES) 
@@ -96,6 +38,42 @@ class TestGameMethods(unittest.TestCase):
 
     def test___player_by_id__(self):
         self.assertEqual(self.game.__player_by_id__(2), self.game.players[1])
+    
+    def test___calculate_pots__(self):
+        m1 = {
+                 'plid': 1,
+                 'decision': Decision(DecisionType.CHECK, 0)
+             }
+        m2 = {
+                'plid': 2,
+                'decision': Decision(DecisionType.BET, 10)
+             }
+        m3 = {
+                'plid': 3,
+                'decision': Decision(DecisionType.RAISE, 30)
+             }
+        m4 = {
+                'plid': 1,
+                'decision': Decision(DecisionType.ALLIN, 20)
+             }
+        m5 = {
+                'plid': 2,
+                'decision': Decision(DecisionType.CALL, 20)
+             }
+        game_info = {'moves': []}
+        game_info['moves'].append([m1, m2, m3, m4, m5])
+        m1 = {
+                'plid': 2,
+                'decision': Decision(DecisionType.BET, 50)
+             }
+        m2 = {
+                'plid': 3,
+                'decision': Decision(DecisionType.ALLIN, 30)
+             }
+        game_info['moves'].append([m1, m2])
+        pots = self.game.__calculate_pots__(game_info)
+        print pots
+
 
 if __name__ == '__main__':
     unittest.main()

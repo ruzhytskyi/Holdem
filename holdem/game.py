@@ -75,12 +75,12 @@ class Game(object):
                     folds.append(player)
                     continue
                 # Handling a case when player went all-in
-                elif move['decision'].dec_type == DecisionType.ALLIN
+                elif move['decision'].dec_type == DecisionType.ALLIN:
                     allins.append(player)
                     continue
-                elif move['decision'].dec_type == DecisionType.RAISE
+                elif move['decision'].dec_type == DecisionType.RAISE:
                     will_move.extend(made_move)
-                elif move['decision'].dec_type == DecisionType.RAISEALLIN
+                elif move['decision'].dec_type == DecisionType.RAISEALLIN:
                     allins.append(player)
                     will_move.extend(made_move)
                     continue
@@ -136,31 +136,27 @@ class Game(object):
 
         return winners_ids
 
-    def __calculate_banks__(self, game_info):
+    def __calculate_pots__(self, game_info):
         """
-        Returns list of banks with values and player ids sharing them
+        Returns list of pots with values and player ids illegible to share them
         """
-        banks = []
-        curr_bank = {}
-        for moves_round in game_info['moves']:
-            for move in moves_round:
-                bet = move['decision'].value
-                dect = move['decision'].dec_type
-                if dect == DecisionType.ALLINRAISE
-                    banks.append(curr_bank)
-                    curr_bank = {}
-                if len(banks) > 0:
-                    for bank in banks:
-                        if move['plid'] in bank['shares'].keys():
-                            if bank['shares'][move['plid']] < bank['max_bet']:
-                                diff = bank['max_bet'] \
-                                       - bank['shares'][move['plid']]
+        shares = {}
+        for mround in game_info['moves']:
+            for move in mround:
+                if move['plid'] not in shares.keys():
+                    shares[move['plid']] = move['decision'].value
+                else:
+                    shares[move['plid']] += move['decision'].value
 
-                                bank['value'] += diff 
-                                bet -= diff
-                        else:
-                            bank['shares'][move['plid']] = bank['max_bet']
-                            bet -= bank['max_bet']
-                        
-                 
-        
+        lshares = shares.items()
+        lshares.sort(key = lambda el: el[1])
+        pots = []
+        for i, share in enumerate(lshares):
+            pot = {}
+            pot['value'] = share[1]*(len(lshares) - i) 
+            pot['plids'] = [sh[0] for sh in lshares[i:]]
+            for j in range(i + 1, len(lshares)):
+                lshares[j] = (lshares[j][0], lshares[j][1] - share[1])
+            pots.append(pot)
+        return pots
+            
