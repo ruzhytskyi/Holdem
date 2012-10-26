@@ -72,6 +72,7 @@ class CLIPlayer(Player):
         """
         Implementation of player's strategy.
         """
+        print "Now it is %r players move" % self.plid
         moves = []
         # Making one list for all moves
         for mround in game_info['moves']:
@@ -85,18 +86,24 @@ class CLIPlayer(Player):
             return {'plid': self.player.plid,
                     'decision': Decision(DecisionType.RAISE, game_info['bbl'])}
           
+        # Last not FOLD and not ALLIN bet
         min_bet = 0
+        # Last not FOLD and not ALLIN move
+        last_move = None
         for move in reversed(moves):
             if move['decision'].dec_type == DecisionType.FOLD:
                 continue
-            if move['decision'].dec_type == DecisionType.ALLIN:
+            if move['decision'].dec_type == DecisionType.ALLINLOWER:
                 continue
             min_bet = move['decision'].value
+            last_move = move
             break 
-                
             
         print "Minimal allowed bet is: %r" % min_bet
         print "Maximum allowed bet is: %r" % self.bankroll
+        # Last not FOLD and not ALLIN decision type
+        if last_move != None:
+            last_dec_type = last_move['decision'].dec_type
         while True:
             print "Make a bet or fold: 'f'."
             bet = raw_input("Please, make a bet: ")
@@ -107,8 +114,24 @@ class CLIPlayer(Player):
             bet = int(bet) 
             
             if min_bet <= bet <= self.bankroll:
-                return {'plid': self.player.plid,
-                        'decision': Decision(DecisionType.BET, bet)}
+                if bet > 0 and last_move == None:
+                    return {'plid': self.player.plid,
+                            'decision': Decision(DecisionType.BET, bet)} 
+                elif bet == 0 and last_move == None:
+                    return {'plid': self.player.plid,
+                            'decision': Decision(DecisionType.CHECK, bet)}
+                elif bet == min_bet and last_dec_type == DecisionType.CHECK:
+                    return {'plid': self.player.plid,
+                            'decision': Decision(DecisionType.CHECK, bet)} 
+                elif bet == min_bet and last_dec_type != DecisionType.CHECK: 
+                    return {'plid': self.player.plid,
+                            'decision': Decision(DecisionType.CALL, bet)}
+                elif bet < min_bet:
+                    return {'plid': self.player.plid,
+                            'decision': Decision(DecisionType.ALLINLOWER, bet)}
+                elif bet >= min_bet and bet == self.bankroll:
+                    return {'plid': self.player.plid,
+                            'decision': Decision(DecisionType.ALLINRAISE, bet)}
             else:
                 print "You've made a wrong move. Try again."
        

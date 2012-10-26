@@ -42,5 +42,12 @@ class Table(object):
     def display_cards(self, game_info):
         print "Diler hands out next card(s): %r" % game_info['cards'][-1]
 
-    def display_move(self, game_info):
-        pass
+    def display_move(self, move):
+        print '---------------'
+        print 'Player with id %r decided to %r with %r' \
+                % (move['plid'], 
+                   move['decision'].dec_type,
+                   move['decision'].value)
+
+    def display_move_start(self):
+        print '---------------'

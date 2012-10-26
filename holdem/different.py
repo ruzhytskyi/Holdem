@@ -1,11 +1,11 @@
 class DecisionType(object):
-    FOLD = 0
-    BET = 1
-    CALL = 2
-    CHECK = 3
-    RAISE = 4
-    ALLIN = 5
-    RAISEALLIN = 6
+    FOLD = 'fold'
+    BET = 'bet'
+    CALL = 'call'
+    CHECK = 'check'
+    RAISE = 'raise'
+    ALLINLOWER = 'allinlower'
+    ALLINRAISE = 'allinraise'
 
 class Decision(object):
     def __init__(self, dec_type, value):

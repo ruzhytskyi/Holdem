@@ -42,7 +42,7 @@ class Game(object):
         folds = []
         allins = []
         made_move = []
-        will_move = self.players
+        will_move = self.players[:]
 
         # Start a rounds of bets
         for round_no in range(4):
@@ -51,14 +51,10 @@ class Game(object):
             if round_no == 1:
                 self.game_info['cards'][round_no] = self.diler.give_three_cards()
             elif round_no == 2 or round_no == 3:
-                self.game_info['cards'][round_no] = self.diler.give_card()
+                self.game_info['cards'][round_no] = [self.diler.give_card()]
     
             # Show cards handed out by diler
             self.table.display_cards(self.game_info)
-
-            if len([player for player in self.players \
-                                if player.bankroll != 0]) < 2:
-                continue
 
             while len(will_move) != 0:
                 player = will_move.pop(0) 
@@ -68,7 +64,9 @@ class Game(object):
                     break
 
                 if player not in allins:
+                    self.table.display_move_start()
                     move = player.make_move(self.game_info)
+                    self.table.display_move(move)
                 else: 
                     continue
                 # Show player's move
@@ -80,37 +78,42 @@ class Game(object):
                     folds.append(player)
                     continue
                 # Handling a case when player went all-in
-                elif move['decision'].dec_type == DecisionType.ALLIN:
+                elif move['decision'].dec_type == DecisionType.ALLINLOWER:
                     allins.append(player)
                     continue
                 elif move['decision'].dec_type == DecisionType.RAISE:
+                    made_move.append(player)
                     will_move.extend(made_move)
-                elif move['decision'].dec_type == DecisionType.RAISEALLIN:
+                    made_move = []
+                elif move['decision'].dec_type == DecisionType.ALLINRAISE:
                     allins.append(player)
                     will_move.extend(made_move)
+                    made_move = []
                     continue
+                else:
+                    made_move.append(player)
 
-                made_move.append(player)
                                 
             # Checking end of game condition: if only one player in next round
             if len(made_move) == 1:
+                will_move = made_move[:]
                 break
 
             will_move = made_move[:]
-
+        
+        candidates = will_move[:]
         # Determine winners
-        winner_ids = self.__determine_winners__()
+        winner_ids = self.__determine_winners__(self.game_info, candidates)
+        pots = self.__calculate_pots__(self.game_info)
 
-        for round_no in range(3):
-            for bank in self.banks[round_no]:
-                # Filter out players that haven't finished a game
-                bank['player_ids'] = list(set(bank['player_ids']) & \
-                                       set(winner_ids))
-                
-                # Share bank among winners
-                for player_id in bank['player_ids']:
-                    self.__player_by_id__(player_id).bankroll \
-                        += bank['value'] / len(bank['player_ids'])
+        # Share pots among winners
+        for pot in pots:
+            plids = list(set(pot['plids']) & set(winner_ids))
+            print plids
+            for plid in plids:
+                self.__player_by_id__(plid).bankroll \
+                += round(pot['value']/len(plids))
+
 
     def __player_by_id__(self, plid):
         """
@@ -119,17 +122,18 @@ class Game(object):
         return filter(lambda pl: True if pl.plid == plid \
                                         else False, self.players)[0] 
 
-    def __determine_winners__(self):
+    def __determine_winners__(self, game_info, candidates):
         """
         Returns a list of winners ids.
         """
         cards_on_table = []
         # Form a list of cards handed out by diler
-        for cards in self.game_info['cards']:
+        print game_info['cards']
+        for cards in game_info['cards']:
             cards_on_table.extend(cards)
         # Making list of tuples with players ids and their best combinations
         pl_combs = [(pl.plid, self.diler.best_comb(cards_on_table + pl.cards)) \
-                    for pl in self.players]
+                    for pl in candidates]
         # Defining sorting function for list of tuples mentioned above
         sort_func = lambda comb1, comb2: \
                         self.diler.compare_combs(comb1[1], comb2[1])
