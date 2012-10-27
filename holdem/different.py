@@ -35,10 +35,10 @@ class Rank(object):
         return [x for x in range(2, 15)]
 
 class Suit(object):
-    SPADES = 1
-    HEARTS = 2
-    DIAMONDS = 3
-    CLUBS = 4
+    SPADES = 'spades'
+    HEARTS = 'hearts'
+    DIAMONDS = 'diamonds'
+    CLUBS = 'clubs'
 
     def elements(self):
         """Returns list of all elements of enum Suit"""
@@ -48,6 +48,18 @@ class Card(object):
     def __init__(self, rank, suit):
         self.rank = rank
         self.suit = suit
+    
+    def __repr__(self):
+        rank = self.rank
+        if self.rank == 11:
+            rank = 'Jack'
+        elif self.rank == 12:
+            rank = 'Queen'
+        elif self.rank == 13:
+            rank = 'King'
+        elif self.rank == 14:
+            rank = 'Ace'
+        return '%r of %r' % (rank, self.suit)
 
 from random import randint
 class Deck(object):
@@ -64,6 +76,16 @@ class Deck(object):
         self.cards_count -= 1
         rank = card % 14 + 1
         suit = card / 14 + 1
+        if suit == 1:
+            suit = Suit.SPADES
+        elif suit == 2:
+            suit = Suit.HEARTS
+        elif suit == 3:
+            suit = Suit.DIAMONDS
+        elif suit == 4:
+            suit = Suit.CLUBS
+        else:
+            print 'Suit is not as expected'
         return Card(rank, suit)
 
 class CombType(object):

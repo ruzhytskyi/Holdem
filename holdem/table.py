@@ -40,7 +40,7 @@ class Table(object):
 
 
     def display_cards(self, game_info):
-        print "Diler hands out next card(s): %r" % game_info['cards'][-1]
+        print "Diler hands out next card(s): %s" % game_info['cards'][-1]
 
     def display_move(self, move):
         print '---------------'
@@ -51,3 +51,7 @@ class Table(object):
 
     def display_move_start(self):
         print '---------------'
+
+    def on_game_started(self):
+        print '---------------'
+        print '--- So, let the game begin! ---'

@@ -73,21 +73,37 @@ class CLIPlayer(Player):
         Implementation of player's strategy.
         """
         print "Now it is %r players move" % self.plid
-        moves = []
-        # Making one list for all moves
-        for mround in game_info['moves']:
-            moves.extend(mround)
-        if len(moves) == 0:
+        # List of rounds
+        mrounds = game_info['moves']
+        # Making a list of moves in current round
+        moves = mrounds[-1]
+        if len(mrounds) == 1 and len(moves) == 0:
             print "Player's move: small blind - %r" %game_info['sbl']
             return {'plid': self.player.plid,
                     'decision': Decision(DecisionType.BET, game_info['sbl'])}
-        if len(moves) == 1:
+        if len(mrounds) == 1 and len(moves) == 1:
             print "Player's move: big blind - %r" %game_info['bbl']
             return {'plid': self.player.plid,
                     'decision': Decision(DecisionType.RAISE, game_info['bbl'])}
-          
-        # Last not FOLD and not ALLIN bet
-        min_bet = 0
+        # Calculate current maximum pot share, that will be minumum bet
+        shares = {}
+        for mround in mrounds:
+            for move in mround:
+                if move['plid'] not in shares.keys():
+                    shares[move['plid']] = move['decision'].value
+                else:
+                    shares[move['plid']] += move['decision'].value
+
+        lshares = shares.items()
+        lshares.sort(key = lambda el: el[1])
+        # Minimum bet is a maximum current share minus player's share
+        if lshares != []:
+            if self.plid in shares.keys():
+                min_bet = lshares[-1][1] - shares[self.plid]
+            else:
+                min_bet = lshares[-1][1]
+        else: 
+            min_bet = 0
         # Last not FOLD and not ALLIN move
         last_move = None
         for move in reversed(moves):
@@ -95,7 +111,6 @@ class CLIPlayer(Player):
                 continue
             if move['decision'].dec_type == DecisionType.ALLINLOWER:
                 continue
-            min_bet = move['decision'].value
             last_move = move
             break 
             
@@ -114,7 +129,7 @@ class CLIPlayer(Player):
             bet = int(bet) 
             
             if min_bet <= bet <= self.bankroll:
-                if bet > 0 and last_move == None:
+                if 0 < bet < self.bankroll and last_move == None:
                     return {'plid': self.player.plid,
                             'decision': Decision(DecisionType.BET, bet)} 
                 elif bet == 0 and last_move == None:
@@ -123,17 +138,20 @@ class CLIPlayer(Player):
                 elif bet == min_bet and last_dec_type == DecisionType.CHECK:
                     return {'plid': self.player.plid,
                             'decision': Decision(DecisionType.CHECK, bet)} 
+                elif bet == self.bankroll:
+                    return {'plid': self.player.plid,
+                            'decision': Decision(DecisionType.ALLINRAISE, bet)}
                 elif bet == min_bet and last_dec_type != DecisionType.CHECK: 
                     return {'plid': self.player.plid,
                             'decision': Decision(DecisionType.CALL, bet)}
-                elif bet < min_bet:
+                elif bet > min_bet:
                     return {'plid': self.player.plid,
-                            'decision': Decision(DecisionType.ALLINLOWER, bet)}
-                elif bet >= min_bet and bet == self.bankroll:
-                    return {'plid': self.player.plid,
-                            'decision': Decision(DecisionType.ALLINRAISE, bet)}
+                            'decision': Decision(DecisionType.RAISE, bet)}
+            elif bet == self.bankroll:
+                return {'plid': self.player.plid,
+                    'decision': Decision(DecisionType.ALLINLOWER, bet)}
             else:
-                print "You've made a wrong move. Try again."
+                print "You've made a wrong bet. Try again."
        
     def take_sit(self, available_sits):
         """Player chooses a sit among available"""
@@ -141,7 +159,7 @@ class CLIPlayer(Player):
         while True:
 # For debug purpose
 #            sit = raw_input("Please, choose your sit: ")
-            sit = available_sits[randint(0, len(available_sits) - 1)]
+            sit = available_sits[0]
             if int(sit) in available_sits:
                 self.sit = int(sit)
                 break
@@ -155,7 +173,7 @@ class CLIPlayer(Player):
 
         while True:
             # buyin = int(raw_input("Please, choose an amount of chips to start with: "))
-            buyin = 200
+            buyin = self.plid * 100 
             if min_buyin <= buyin <= self.player.cash_amount:
                 self.player.cash_amount -= buyin
                 self.bankroll += buyin 

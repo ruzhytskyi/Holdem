@@ -29,6 +29,7 @@ class Game(object):
    
     def play_game(self):
         """Implementation of game flow"""
+        self.table.on_game_started()
         # Sort players accroding to button position
         func = lambda player: player.sit if player.sit > self.but_pos \
                                             else player.sit + len(self.sits)
@@ -59,9 +60,9 @@ class Game(object):
             while len(will_move) != 0:
                 player = will_move.pop(0) 
                 # Checking end of game: if only one player left in game
-                if len(made_move) == 0 and len(will_move) == 0:
-                    made_move.append(player)
-                    break
+                #if len(made_move) == 0 and len(will_move) == 0:
+                #    made_move.append(player)
+                #    break
 
                 if player not in allins:
                     self.table.display_move_start()
@@ -82,9 +83,8 @@ class Game(object):
                     allins.append(player)
                     continue
                 elif move['decision'].dec_type == DecisionType.RAISE:
-                    made_move.append(player)
                     will_move.extend(made_move)
-                    made_move = []
+                    made_move = [player]
                 elif move['decision'].dec_type == DecisionType.ALLINRAISE:
                     allins.append(player)
                     will_move.extend(made_move)
@@ -100,6 +100,7 @@ class Game(object):
                 break
 
             will_move = made_move[:]
+            made_move = []
         
         candidates = will_move[:]
         # Determine winners
