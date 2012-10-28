@@ -16,6 +16,7 @@ class Table(object):
         self.table_history = []
         self.sits = range(1, sits_count + 1)
         self.players = []
+        self.msg_separator = '--------------'
 
     def add_player(self, player):
         """Registers player for current table"""
@@ -40,18 +41,27 @@ class Table(object):
 
 
     def display_cards(self, game_info):
+        print self.msg_separator 
         print "Diler hands out next card(s): %s" % game_info['cards'][-1]
 
     def display_move(self, move):
-        print '---------------'
+        print self.msg_separator 
         print 'Player with id %r decided to %r with %r' \
                 % (move['plid'], 
                    move['decision'].dec_type,
                    move['decision'].value)
 
     def display_move_start(self):
-        print '---------------'
+        print self.msg_separator 
 
     def on_game_started(self):
-        print '---------------'
+        print self.msg_separator 
         print '--- So, let the game begin! ---'
+
+    def announce_win(self, plid, comb, amount):
+        print self.msg_separator
+        print 'Player %r wins %r with %r: %r' \
+                % (plid,
+                   amount,
+                   comb[0],
+                   comb[1])

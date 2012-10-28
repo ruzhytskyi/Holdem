@@ -114,6 +114,7 @@ class CLIPlayer(Player):
             last_move = move
             break 
             
+        print "Cards: %r" % self.cards
         print "Minimal allowed bet is: %r" % min_bet
         print "Maximum allowed bet is: %r" % self.bankroll
         # Last not FOLD and not ALLIN decision type

@@ -74,8 +74,8 @@ class Deck(object):
         card_no = randint(1, self.cards_count)
         card = self.deck.pop(card_no - 1)
         self.cards_count -= 1
-        rank = card % 14 + 1
-        suit = card / 14 + 1
+        rank = card % 13 + 2
+        suit = (card - 1) / 13 + 1
         if suit == 1:
             suit = Suit.SPADES
         elif suit == 2:

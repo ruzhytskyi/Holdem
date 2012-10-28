@@ -60,18 +60,18 @@ class Game(object):
             while len(will_move) != 0:
                 player = will_move.pop(0) 
                 # Checking end of game: if only one player left in game
-                #if len(made_move) == 0 and len(will_move) == 0:
-                #    made_move.append(player)
-                #    break
+                if len(made_move) == 0 and len(will_move) == 0:
+                    made_move.append(player)
+                    break
 
                 if player not in allins:
                     self.table.display_move_start()
+                    # Show player's move
                     move = player.make_move(self.game_info)
                     self.table.display_move(move)
                 else: 
                     continue
-                # Show player's move
-                # self.table.display_move(self.game_info)
+
                 self.game_info['moves'][round_no].append(move)
                 bet = move['decision'].value
                 player.bankroll -= bet
@@ -104,17 +104,18 @@ class Game(object):
         
         candidates = will_move[:]
         # Determine winners
-        winner_ids = self.__determine_winners__(self.game_info, candidates)
+        winner_combs = self.__determine_winners__(self.game_info, candidates)
+        winner_ids = [wc[0] for wc in winner_combs]
         pots = self.__calculate_pots__(self.game_info)
 
         # Share pots among winners
         for pot in pots:
             plids = list(set(pot['plids']) & set(winner_ids))
-            print plids
             for plid in plids:
-                self.__player_by_id__(plid).bankroll \
-                += round(pot['value']/len(plids))
-
+                amount = round(pot['value']/len(plids))
+                comb = dict(winner_combs)[plid]
+                self.__player_by_id__(plid).bankroll += amount 
+                self.table.announce_win(plid, comb, amount)
 
     def __player_by_id__(self, plid):
         """
@@ -140,13 +141,13 @@ class Game(object):
                         self.diler.compare_combs(comb1[1], comb2[1])
         # Sort list of tuples mentioned above, preparing to determine winners
         pl_combs.sort(cmp = sort_func, reverse = True)
-        winners_ids = []
+        winner_combs = []
         # Determing winners ids
         for comb in pl_combs:
             if self.diler.compare_combs(comb[1], pl_combs[0][1]) == 0:
-                winners_ids.append(comb[0])
+                winner_combs.append(comb)
 
-        return winners_ids
+        return winner_combs
 
     def __calculate_pots__(self, game_info):
         """
