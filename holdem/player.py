@@ -114,7 +114,8 @@ class CLIPlayer(Player):
             last_move = move
             break 
             
-        print "Cards: %r" % self.cards
+        print "Cards on table: %r" % game_info['cards']
+        print "Poket cards: %r" % self.cards
         print "Minimal allowed bet is: %r" % min_bet
         print "Maximum allowed bet is: %r" % self.bankroll
         # Last not FOLD and not ALLIN decision type
@@ -175,6 +176,7 @@ class CLIPlayer(Player):
         while True:
             # buyin = int(raw_input("Please, choose an amount of chips to start with: "))
             buyin = self.plid * 100 
+            # buyin = 200
             if min_buyin <= buyin <= self.player.cash_amount:
                 self.player.cash_amount -= buyin
                 self.bankroll += buyin 

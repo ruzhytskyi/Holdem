@@ -201,7 +201,18 @@ class Diler(object):
         Returns a list of 5 cards from given list that form straight
         or None otherwise
         """
+        
         scards = sorted(cards, key = lambda card: card.rank)
+        # Filter cards with same rank
+        pos = 0
+        for i, card in enumerate(scards[:-1]):
+            if card.rank == scards[i + 1].rank:
+                scards.insert(pos, scards.pop(i + 1))
+                pos += 1
+        del(scards[:pos])
+        if len(scards) < 5:
+            return None
+            
         if scards[-1].rank == Rank.ACE:
             scards.insert(0, scards[-1])
         # Form possible straight combinations

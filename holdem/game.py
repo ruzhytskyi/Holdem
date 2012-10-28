@@ -59,10 +59,6 @@ class Game(object):
 
             while len(will_move) != 0:
                 player = will_move.pop(0) 
-                # Checking end of game: if only one player left in game
-                if len(made_move) == 0 and len(will_move) == 0:
-                    made_move.append(player)
-                    break
 
                 if player not in allins:
                     self.table.display_move_start()
@@ -93,26 +89,44 @@ class Game(object):
                 else:
                     made_move.append(player)
 
+                # Checking end of game: if only one player left in game
+                if len(made_move) == 0 and len(allins) == 0 \
+                        and len(will_move) == 1:
+                    made_move.append(will_move.pop(player))
+                    break
+
+                # Handle big blind bet: add player to moves queue
+                if round_no == 0 and len(self.game_info['moves'][0]) == 2:
+                    will_move.extend(made_move)
+                    made_move = []
+
                                 
             # Checking end of game condition: if only one player in next round
-            if len(made_move) == 1:
-                will_move = made_move[:]
+            if len(made_move) == 1 and len(allins) == 0:
                 break
+            
+            # Checking if there are allin players
+            if len(made_move) < 2 and len(allins) > 0:
+                continue
 
-            will_move = made_move[:]
-            made_move = []
+            # Players who made move in this round will move in next round
+            if round_no != 3:
+                will_move = made_move[:]
+                made_move = []
         
-        candidates = will_move[:]
+        finalists = made_move[:] + allins
         # Determine winners
-        winner_combs = self.__determine_winners__(self.game_info, candidates)
-        winner_ids = [wc[0] for wc in winner_combs]
+        fin_ids = [fn.plid for fn in finalists]
         pots = self.__calculate_pots__(self.game_info)
 
         # Share pots among winners
         for pot in pots:
-            plids = list(set(pot['plids']) & set(winner_ids))
-            for plid in plids:
-                amount = round(pot['value']/len(plids))
+            cand_ids = list(set(pot['plids']) & set(fin_ids))
+            candidates = [self.__player_by_id__(pid) for pid in cand_ids] 
+            winner_combs = self.__determine_winners__(self.game_info, candidates)
+            winner_ids = [wc[0] for wc in winner_combs]
+            for plid in winner_ids:
+                amount = round(pot['value']/len(winner_ids))
                 comb = dict(winner_combs)[plid]
                 self.__player_by_id__(plid).bankroll += amount 
                 self.table.announce_win(plid, comb, amount)
@@ -130,7 +144,6 @@ class Game(object):
         """
         cards_on_table = []
         # Form a list of cards handed out by diler
-        print game_info['cards']
         for cards in game_info['cards']:
             cards_on_table.extend(cards)
         # Making list of tuples with players ids and their best combinations

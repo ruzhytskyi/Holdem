@@ -118,6 +118,20 @@ class TestDilerMethods(unittest.TestCase):
         self.assertEqual(len(rcards), 5)
         self.assertSetEqual(set(rcards), set([c2, c4, c5, c6, c7]))
 
+    def test___check_straight__1(self):
+        c1 = Card(Rank.TWO, Suit.SPADES)
+        c2 = Card(Rank.FOUR, Suit.HEARTS)
+        c3 = Card(Rank.FIVE, Suit.DIAMONDS)
+        c4 = Card(Rank.THREE, Suit.SPADES)
+        c5 = Card(Rank.SIX, Suit.SPADES)
+        c6 = Card(Rank.FOUR, Suit.SPADES)
+        c7 = Card(Rank.SIX, Suit.HEARTS)
+        cards = [c1, c2, c3, c4, c5, c6, c7]
+        rcards = self._diler.__check_straight__(cards)
+        self.assertEqual(len(rcards), 5)
+        self.assertSetEqual(set(rcards), set([c2, c4, c5, c1, c3]))
+
+
     def test___check_straight__five_cards(self):
         c1 = Card(Rank.FOUR, Suit.CLUBS)
         c2 = Card(Rank.SIX, Suit.SPADES)
